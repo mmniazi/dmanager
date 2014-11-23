@@ -1,0 +1,148 @@
+package Controllers;
+
+import Components.CellData;
+import Components.AddPopUp;
+import States.StateData;
+import States.StateManagment;
+import Util.State;
+import Util.Utilities;
+import dmanager.Downloader;
+import java.net.URI;
+import java.net.URL;
+import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TreeView;
+import javafx.scene.layout.AnchorPane;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+
+/**
+ *
+ * @author muhammad
+ */
+public class layoutController implements Initializable {
+
+    // Front End
+    @FXML
+    private Button exitButton;
+
+    @FXML
+    private Button deleteButton;
+
+    @FXML
+    private Button prButton;
+
+    @FXML
+    private ListView<DataObjects> listView;
+
+    @FXML
+    private Button addButton;
+
+    @FXML
+    private AnchorPane MainWindow;
+    @FXML
+    private TreeView treeView;
+
+    private String prButtonState = "pause";
+    ObservableList<DataObjects> downloadsList;
+
+    //Back End
+    PoolingHttpClientConnectionManager connectionManager;
+    CloseableHttpClient client;
+    StateManagment stateManager;
+    ExecutorService threadService;
+    
+    @FXML
+    private void addButtonController(ActionEvent actionEvent) {
+        AddPopUp popUp = new AddPopUp(MainWindow.getScene().getWindow());
+        popUp.startButton.addEventHandler(ActionEvent.ACTION, (ActionEvent event) -> {
+            String uri = popUp.uriField.getText();
+            popUp.popupWindow.hide();
+            StateData data = new StateData("/home/muhammad/", URI.create(uri),
+                    Utilities.getFileName(uri), 10);
+            DataObjects dataObject = new DataObjects(new Downloader(data, client,
+                    threadService), data);
+            downloadsList.add(dataObject);
+            stateManager.changeState(data, "createState");
+        });
+    }
+
+    @FXML
+    private void prButtonController(ActionEvent actionEvent) {
+        switch (prButtonState) {
+            case "pause":
+                prButtonState = "resume";
+                prButton.setText(prButtonState);
+                listView.getSelectionModel().getSelectedIndices();
+                break;
+            case "resume":
+                prButtonState = "pause";
+                prButton.setText(prButtonState);
+                break;
+        }
+    }
+
+    @FXML
+    private void deleteButtonController(ActionEvent actionEvent) {
+
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        // initializing Back End 
+        threadService = Executors.newCachedThreadPool();
+        stateManager = StateManagment.getInstance();
+        connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(1000);
+        connectionManager.setDefaultMaxPerRoute(100);
+        client = HttpClients.custom().
+                setConnectionManager(connectionManager).build();
+        downloadsList = FXCollections.observableArrayList();
+        stateManager.readFromFile().stream().forEach((next) -> {
+            if (next.state == State.ACTIVE) {
+                downloadsList.add(new DataObjects(
+                        new Downloader(next, client, threadService), next));
+            } else {
+                downloadsList.add(new DataObjects(null, next));
+            }
+        });
+        listView.setItems(downloadsList);
+        listView.setCellFactory(ListView -> new ListCell<DataObjects>() {
+            @Override
+            protected void updateItem(DataObjects item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    CellData data = new CellData();
+                    data.setData(item.data);
+                    setGraphic(data.getCell());
+                }
+            }
+        });
+        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    }
+
+    private class DataObjects {
+
+        Downloader downloader;
+        StateData data;
+
+        public DataObjects(Downloader downloader, StateData data) {
+            this.downloader = downloader;
+            this.data = data;
+        }
+    }
+}
+

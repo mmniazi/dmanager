@@ -1,0 +1,85 @@
+.button {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
+.list-cell {
+    -fx-background-color: #f9f9f9;
+}
+
+.list-view {
+    -fx-background-color: #f9f9f9;
+}
+
+.label {
+    -fx-text-fill: #333333;
+}
+
+.text-field {
+    -fx-background-radius: 2;
+    -fx-border-color: #333333;
+    -fx-background-color: #f9f9f9;
+}
+
+.combo-box {
+    -fx-background-radius: 2;
+    -fx-border-color: #333333;
+    -fx-background-color: #f9f9f9;
+}
+
+.tree-cell {
+    -fx-background-color: #333333;
+    -fx-text-fill: #f9f9f9;
+}
+
+.tree-cell:selected {
+    -fx-background-color: #f9f9f9;
+    -fx-text-fill: #333333;
+}
+
+.tree-view {
+    -fx-background-color: #333333;
+}
+
+.sidePaneLabel {
+    -fx-text-fill: #f9f9f9;
+}
+
+.listButtons {
+    -fx-background-color: #f9f9f9;
+}
+#AddButton {
+    -fx-graphic: url(../resources/AddButton.png);
+}
+
+#PauseButton {
+    -fx-graphic: url(../resources/PauseButton.png);
+}
+
+#ResumeButton {
+    -fx-graphic: url(../resources/ResumeButton.png);
+}
+
+#DeleteButton {
+    -fx-graphic: url(../resources/DeleteButton.png);
+}
+
+#MinimizeButton {
+    -fx-graphic: url(../resources/MinimizeButton.png);
+}
+
+#SettingButton {
+    -fx-graphic: url(../resources/SettingButton.png);
+}
+
+#ExitButton {
+    -fx-text-fill: #e74c3c;
+}
+
+#BackgroundPane {
+    -fx-background-color: #f9f9f9;
+}
+
+#SidePane {
+    -fx-background-color: #333333;
+}

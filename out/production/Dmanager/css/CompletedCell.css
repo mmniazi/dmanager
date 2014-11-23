@@ -1,0 +1,52 @@
+
+.button {
+    -fx-background-radius: 2;
+    -fx-background-color: #3fb19b;
+}
+
+.progress-bar .bar {
+    -fx-padding: 0px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.progress-bar .track {
+    -fx-background-radius: 0;
+    -fx-background-color: #f9f9f9
+}
+
+.pane {
+    -fx-background-color: #f9f9f9
+}
+
+.check-box > .box {
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: transparent;
+    -fx-padding: 0
+}
+
+.check-box > .box > .mark {
+    -fx-background-image: url("../resources/Green.png");
+    -fx-padding: 8;
+    -fx-shape: null;
+    -fx-background-repeat: no-repeat
+
+}
+
+.check-box:selected > .box > .mark {
+    -fx-background-image: url("../resources/GreenSelected.png");
+    -fx-padding: 10;
+    -fx-background-repeat: round
+}
+
+.label {
+    -fx-text-fill: #333333;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}
+
+.statusLabel {
+    -fx-text-alignment: left;
+    -fx-alignment: center-right;
+}
