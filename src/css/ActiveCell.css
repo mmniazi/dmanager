@@ -8,6 +8,7 @@
     -fx-border-radius: 0;
     -fx-padding: 1px;
     -fx-background-insets: 0;
+    -fx-background-color: #3498db;
 }
 
 .progress-bar .track {
