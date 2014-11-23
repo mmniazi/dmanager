@@ -81,6 +81,7 @@ public class DownloaderCell extends ListCell {
   // TODO: Check performance of program.
   public void set() {
     // Setting data
+      System.out.println("set called");
     preSetGui();
     switch (data.state) {
 
@@ -165,6 +166,7 @@ public class DownloaderCell extends ListCell {
   //TODO: even after complete functions end there are some threads writing which overwrites STATE.COMPLETE value with ACTIVE value
   //TODO: On resuming the download speed haves, maybe using a separate client will help
   private void connect() {
+      System.out.println("connect called");
     threadService.execute(() -> {
       // create an empty file
       try {
@@ -311,15 +313,15 @@ public class DownloaderCell extends ListCell {
   }
 
   private void complete() {
+      data.state = State.CMPLTD;
     try {
       fileChannel.close();
       file.close();
     } catch (IOException ex) {
       Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
     }
-    data.state = State.CMPLTD;
-    stateManager.changeState(data, "saveState");
-    Platform.runLater(this::set);
+      stateManager.changeState(data, "saveState");
+      Platform.runLater(this::set);
   }
 
   private void resetData() {
@@ -386,6 +388,7 @@ public class DownloaderCell extends ListCell {
         }
         if (data.bytesDone.get() == data.sizeOfFile) {
           complete();
+            System.out.println("complete called");
         }
         // Algorithm for dynamic segmentation.
         if (data.state.equals(State.ACTIVE)) {
