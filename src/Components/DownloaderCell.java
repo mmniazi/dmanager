@@ -162,7 +162,7 @@ public class DownloaderCell extends ListCell {
       }
     });
   }
-
+  //TODO: even after complete functions end there are some threads writing which overwrites STATE.COMPLETE value with ACTIVE value
   //TODO: On resuming the download speed haves, maybe using a separate client will help
   private void connect() {
     threadService.execute(() -> {
