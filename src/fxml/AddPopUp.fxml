@@ -35,7 +35,7 @@
         </Label>
         <TextField fx:id="uriField" layoutX="80.0" layoutY="18.0" onKeyTyped="#uriFieldController" prefHeight="25.0"
                    prefWidth="415.0"
-                   text="http://downloads.sourceforge.net/project/sevenzip/7-Zip/9.22/7z922.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fsevenzip%2F&amp;ts=1415925898&amp;use_mirror=kaz"
+                   text="http://softlayer-sng.dl.sourceforge.net/project/elementaryos/unstable/elementaryos-unstable-amd64.20140810.iso"
                    AnchorPane.leftAnchor="90.0" AnchorPane.rightAnchor="210.0" AnchorPane.topAnchor="15.0"/>
         <TextField fx:id="nameField" layoutX="80.0" layoutY="62.0" prefHeight="25.0" prefWidth="415.0"
                    AnchorPane.bottomAnchor="62.0" AnchorPane.leftAnchor="90.0" AnchorPane.rightAnchor="210.0"

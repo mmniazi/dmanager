@@ -24,7 +24,7 @@
     -fx-background-insets: 0;
     -fx-background-radius: 0;
     -fx-background-color: transparent;
-    -fx-padding: 0
+    -fx-padding: 0;
 }
 
 .check-box > .box > .mark {

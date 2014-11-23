@@ -21,8 +21,6 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Paint;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -60,7 +58,9 @@ public class layoutController implements Initializable {
     private TreeView<String> treeView;
     private String prButtonState = "pause";
 
-    // TODO: get headers from url and pass it to the client
+    // TODO: check stackoverflow for answer to cookie problem
+    // TODO: so nothing is stopping the whole downloading code keeps on running even after paused
+    // TODO: may speed being halved is caused by the same above problem, because now there are two update threads and speed is distributed between them
     @FXML
     private void addButtonController(ActionEvent actionEvent) {
 //http://softlayer-sng.dl.sourceforge.net/project/elementaryos/unstable/elementaryos-unstable-amd64.20140810.iso
@@ -121,7 +121,7 @@ public class layoutController implements Initializable {
 
     // TODO: create post about how to create a treeView with only single expanded treeItem
     // TODO: add animations to treeView
-    //TODO: make pr and delete button work and make mechanism for toggling check box when selecting list cells
+    // TODO: make pr and delete button work and make mechanism for toggling check box when selecting list cells
     private void initCategoriesTree() {
 
         TreeItem<String> root = new TreeItem<>("Root Node");
