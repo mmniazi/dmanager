@@ -24,7 +24,7 @@ Currently following features are being developed:
 
 ## Advanced Features: ##
 
-- Video acceleration 
+- Video acceleration
 
 - Page acceleration
 
@@ -41,4 +41,4 @@ Currently following features are being developed:
 - Native executables for windows,mac and linux
 
 
-Email me @** muhammad.mohsin1994@gmail.com** if you want to contribute to this project
+Email me @** muhammad.mohsin1994@gmail.com** if you want to contribute to this project.
