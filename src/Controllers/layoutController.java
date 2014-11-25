@@ -40,7 +40,6 @@ public class layoutController implements Initializable {
     PoolingHttpClientConnectionManager connectionManager;
     CloseableHttpClient client;
     StateManagement stateManager;
-    ExecutorService threadService;
     // Front End
     @FXML
     private Button exitButton;
@@ -73,8 +72,8 @@ public class layoutController implements Initializable {
             popUp.popupWindow.hide();
             StateData data = new StateData(System.getProperty("user.home") + "/", URI.create(uri),
                     Utilities.getFromURI(uri, "filename.ext"), 10);
-            DownloaderCell downloader = new DownloaderCell(data, client,
-                    threadService);
+            DownloaderCell downloader = new DownloaderCell(data, client
+            );
             downloadsList.add(downloader);
             stateManager.changeState(data, "createState");
             downloader.set();
@@ -103,7 +102,6 @@ public class layoutController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 // initializing Back End
-        threadService = Executors.newCachedThreadPool();
         stateManager = StateManagement.getInstance();
         connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(1000);
@@ -193,7 +191,7 @@ public class layoutController implements Initializable {
     private void initDownloadsList() {
         downloadsList = FXCollections.observableArrayList();
         stateManager.readFromFile().stream().forEach((next) -> {
-            DownloaderCell downloader = new DownloaderCell(next, client, threadService);
+            DownloaderCell downloader = new DownloaderCell(next, client);
             downloadsList.add(downloader);
             downloader.set();
         });

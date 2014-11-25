@@ -33,6 +33,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,12 +62,11 @@ public class DownloaderCell extends ListCell {
     @FXML
     private Label fileLabel, sDoneLabel, sTotalLabel, timeLabel, speedLabel, statusLabel;
 
-    public DownloaderCell(StateData data, CloseableHttpClient client,
-                          ExecutorService threadService) {
+    public DownloaderCell(StateData data, CloseableHttpClient client) {
         this.data = data;
         this.currentBytes = data.bytesDone.get();
         this.client = client;
-        this.threadService = threadService;
+        this.threadService = Executors.newCachedThreadPool();
         type = Utilities.findType(Utilities.getFromURI(data.uri.toString(), "ext"));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/ListCell.fxml"));
         fxmlLoader.setController(this);
@@ -165,6 +165,7 @@ public class DownloaderCell extends ListCell {
 
     //TODO: make sure every thread ends on end what ever the case
     //TODO: On resuming the download speed haves, maybe using a separate client will help
+    /*TODO: InshaAllah I wil be creating a separate threadservice for each cell and then ending that service using application thread and then as usual set method will be called on application thread*/
     private void connect() {
         threadService.execute(() -> {
             // create an empty file
