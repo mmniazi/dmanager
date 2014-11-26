@@ -144,6 +144,7 @@ public class DownloaderCell extends ListCell {
                 defaultButton.setText("Resume");
                 defaultButton.setOnAction((ActionEvent event) -> {
                     data.state = State.ACTIVE;
+                    threadService = Executors.newCachedThreadPool();
                     Platform.runLater(this::set);
                 });
                 break;
@@ -151,17 +152,16 @@ public class DownloaderCell extends ListCell {
     }
 
     public void stopDownload() {
-        threadService.execute(() -> {
-            try {
-                data.state = State.PAUSED;
-                fileChannel.close();
-                file.close();
-                stateManager.changeState(data, "saveState");
-                Platform.runLater(this::set);
-            } catch (IOException ex) {
-                Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        });
+        data.state = State.PAUSED;
+        try {
+            fileChannel.close();
+            file.close();
+        } catch (IOException ex) {
+            Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        stateManager.changeState(data, "saveState");
+        threadService.shutdown();
+        Platform.runLater(this::set);
     }
 
     //TODO: make sure every thread ends on end what ever the case
@@ -170,6 +170,7 @@ public class DownloaderCell extends ListCell {
     // TODO: -1 is returned when i try to download calendar data from link.
     // TODO: if download is paused and resumed instantly then java.io.IOException: Stream Closed is thrown
     // TODO: if download is paused while connecting.
+    // TODO: if two same downloads are started they start overwriting the same file make some way of handling same downloads
     private void connect() {
         threadService.execute(() -> {
             try {
@@ -225,14 +226,12 @@ public class DownloaderCell extends ListCell {
     }
 
     private void start() {
-        threadService.execute(() -> {
-            //Download each segment independently.
-            for (int i = 0; i <= data.segments; i++) {
-                if (data.initialState.get(i) < data.finalState.get(i)) {
-                    threadService.execute(new Segment(i));
-                }
+        //Download each segment independently.
+        for (int i = 0; i <= data.segments; i++) {
+            if (data.initialState.get(i) < data.finalState.get(i)) {
+                threadService.execute(new Segment(i));
             }
-        });
+        }
     }
 
     private void preSetGui() {
@@ -317,6 +316,7 @@ public class DownloaderCell extends ListCell {
             Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
         }
         stateManager.changeState(data, "saveState");
+        threadService.shutdown();
         Platform.runLater(this::set);
     }
 
