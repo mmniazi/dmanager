@@ -24,12 +24,9 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-
 import java.net.URI;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author muhammad
@@ -72,8 +69,7 @@ public class layoutController implements Initializable {
             popUp.popupWindow.hide();
             StateData data = new StateData(System.getProperty("user.home") + "/", URI.create(uri),
                     Utilities.getFromURI(uri, "filename.ext"), 10);
-            DownloaderCell downloader = new DownloaderCell(data, client
-            );
+            DownloaderCell downloader = new DownloaderCell(data, client);
             downloadsList.add(downloader);
             stateManager.changeState(data, "createState");
             downloader.set();
