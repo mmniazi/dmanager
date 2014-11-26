@@ -299,9 +299,9 @@ public class DownloaderCell extends ListCell {
                         speedLabel.setText(Utilities.speedConverter(finalAverageSpeed));
                         sDoneLabel.setText(Utilities.sizeConverter(data.bytesDone.get()));
                         sTotalLabel.setText(Utilities.sizeConverter(data.sizeOfFile));
-                        progressBar.setProgress(data.bytesDone.get() / data.sizeOfFile);
+                        progressBar.setProgress(data.bytesDone.floatValue() / data.sizeOfFile);
                         timeLabel.setText(Utilities.timeConverter(data.sizeOfFile - data.bytesDone.get(), finalAverageSpeed));
-                        statusLabel.setText("(" + (data.bytesDone.get() / data.sizeOfFile) * 100 + "%" + ")");
+                        statusLabel.setText("(" + (data.bytesDone.get() * 100) / data.sizeOfFile + "%" + ")");
                     }
                 });
             } while (data.state.equals(State.ACTIVE) && data.bytesDone.get() != data.sizeOfFile);
