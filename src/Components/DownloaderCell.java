@@ -8,6 +8,7 @@ package Components;
 import States.StateData;
 import States.StateManagement;
 import Util.State;
+import Util.URI;
 import Util.Utilities;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -68,9 +69,10 @@ public class DownloaderCell extends ListCell {
         this.currentBytes = data.bytesDone.get();
         this.client = client;
         this.threadService = Executors.newCachedThreadPool();
-        type = Utilities.findType(Utilities.getFromURI(data.uri.toString(), "ext"));
+        type = Utilities.findType(Utilities.getFromURI(data.uri.toString(), URI.EXT));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/ListCell.fxml"));
         fxmlLoader.setController(this);
+        System.out.println(data.uri);
         try {
             fxmlLoader.load();
         } catch (IOException e) {
@@ -226,7 +228,7 @@ public class DownloaderCell extends ListCell {
     }
 
     private void start() {
-        //Download each segment independently.
+        // TODO: chck why its not working for 1 segment @arrayoutofboundexception
         for (int i = 0; i <= data.segments; i++) {
             if (data.initialState.get(i) < data.finalState.get(i)) {
                 threadService.execute(new Segment(i));
