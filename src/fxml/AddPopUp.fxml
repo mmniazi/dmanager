@@ -33,7 +33,7 @@
                 <Font name="Dense-Regular" size="13.0"/>
             </font>
         </Label>
-        <TextField fx:id="uriField" layoutX="80.0" layoutY="18.0" onKeyTyped="#uriFieldController" prefHeight="25.0"
+        <TextField fx:id="uriField" layoutX="80.0" layoutY="18.0" prefHeight="25.0"
                    prefWidth="415.0"
                    text="http://softlayer-sng.dl.sourceforge.net/project/elementaryos/unstable/elementaryos-unstable-amd64.20140810.iso"
                    AnchorPane.leftAnchor="90.0" AnchorPane.rightAnchor="210.0" AnchorPane.topAnchor="15.0"/>

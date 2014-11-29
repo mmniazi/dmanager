@@ -5,6 +5,7 @@ import Components.DownloaderCell;
 import States.StateData;
 import States.StateManagement;
 import Util.Utilities;
+import com.sun.javafx.property.adapter.PropertyDescriptor;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -27,17 +28,23 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import java.net.URI;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
+import javafx.scene.input.MouseEvent;
 
 /**
  * @author muhammad
  */
 public class layoutController implements Initializable {
+    ExecutorService threadService;
     ObservableList<DownloaderCell> downloadsList;
-    //Back End
     PoolingHttpClientConnectionManager connectionManager;
     CloseableHttpClient client;
     StateManagement stateManager;
-    // Front End
     @FXML
     private Button exitButton;
     @FXML
@@ -54,22 +61,15 @@ public class layoutController implements Initializable {
     private TreeView<String> treeView;
     private String prButtonState = "pause";
 
-    // TODO: check stackoverflow for answer to cookie problem
-    // TODO: so nothing is stopping the whole downloading code keeps on running even after paused
-    // TODO: may speed being halved is caused by the same above problem, because now there are two update threads and speed is distributed between them
     @FXML
     private void addButtonController(ActionEvent actionEvent) {
-//http://softlayer-sng.dl.sourceforge.net/project/elementaryos/unstable/elementaryos-unstable-amd64.20140810.iso
-//https://www.google.com/calendar/ical/tk5scqbfe80ffdcfj86uppbhvk%40group.calendar.google.com/private-0dfe7855fa8b78365041b2b27261446e/basic.ics
-//http://downloads.sourceforge.net/project/sevenzip/7-Zip/9.22/7z922.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fsevenzip%2F&ts=1415925898&use_mirror=kaz
         AddPopUp popUp = new AddPopUp(MainWindow.getScene().getWindow());
         popUp.startButton.addEventHandler(ActionEvent.ACTION, (ActionEvent event) -> {
             String uri = popUp.uriField.getText();
-            System.out.println(URI.create(uri));
             popUp.popupWindow.hide();
             StateData data = new StateData(System.getProperty("user.home") + "/", URI.create(uri),
-                    Utilities.getFromURI(uri, "filename.ext"), 10);
-            DownloaderCell downloader = new DownloaderCell(data, client);
+                    Utilities.getFromURI(uri, Util.URI.FILENAME_EXT), 10);
+            DownloaderCell downloader = new DownloaderCell(data, client, threadService);
             downloadsList.add(downloader);
             stateManager.changeState(data, "createState");
             downloader.set();
@@ -82,7 +82,8 @@ public class layoutController implements Initializable {
             case "pause":
                 prButtonState = "resume";
                 prButton.setText(prButtonState);
-                listView.getSelectionModel().getSelectedIndices();
+                System.out.println(
+                listView.getSelectionModel().getSelectedIndices());
                 break;
             case "resume":
                 prButtonState = "pause";
@@ -97,7 +98,7 @@ public class layoutController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-// initializing Back End
+        threadService = Executors.newCachedThreadPool();
         stateManager = StateManagement.getInstance();
         connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(1000);
@@ -112,7 +113,7 @@ public class layoutController implements Initializable {
         initDownloadsList();
         initCategoriesTree();
     }
-
+    
     // TODO: create post about how to create a treeView with only single expanded treeItem
     // TODO: add animations to treeView
     // TODO: make pr and delete button work and make mechanism for toggling check box when selecting list cells
@@ -121,22 +122,22 @@ public class layoutController implements Initializable {
         TreeItem<String> root = new TreeItem<>("Root Node");
         root.setExpanded(true);
 
-        TreeItem<String> allDownloads =
-                new TreeItem<>("All Downloads", new ImageView(new Image(
-                        getClass().getResourceAsStream("/resources/White.png"))));
+        TreeItem<String> allDownloads
+                = new TreeItem<>("All Downloads", new ImageView(new Image(
+                                        getClass().getResourceAsStream("/resources/White.png"))));
         allDownloads.setExpanded(true);
-        TreeItem<String> inProgress =
-                new TreeItem<>("Downloading", new ImageView(new Image(
-                        getClass().getResourceAsStream("/resources/Green.png"))));
-        TreeItem<String> completed =
-                new TreeItem<>("Completed", new ImageView(new Image(
-                        getClass().getResourceAsStream("/resources/Blue.png"))));
-        TreeItem<String> paused =
-                new TreeItem<>("Paused", new ImageView(new Image(
-                        getClass().getResourceAsStream("/resources/Orange.png"))));
-        TreeItem<String> failed =
-                new TreeItem<>("Failed", new ImageView(new Image(
-                        getClass().getResourceAsStream("/resources/Red.png"))));
+        TreeItem<String> inProgress
+                = new TreeItem<>("Downloading", new ImageView(new Image(
+                                        getClass().getResourceAsStream("/resources/Green.png"))));
+        TreeItem<String> completed
+                = new TreeItem<>("Completed", new ImageView(new Image(
+                                        getClass().getResourceAsStream("/resources/Blue.png"))));
+        TreeItem<String> paused
+                = new TreeItem<>("Paused", new ImageView(new Image(
+                                        getClass().getResourceAsStream("/resources/Orange.png"))));
+        TreeItem<String> failed
+                = new TreeItem<>("Failed", new ImageView(new Image(
+                                        getClass().getResourceAsStream("/resources/Red.png"))));
 // Adding all tree items to root item
         root.getChildren().addAll(allDownloads, completed, failed, inProgress, paused);
 
@@ -154,25 +155,28 @@ public class layoutController implements Initializable {
             parentItem.getChildren().addAll(programs, compressed, documents, videos, audio, images, others);
         }
 
-/*----- Setting the root tree item and hiding root -----*/
+        /*----- Setting the root tree item and hiding root -----*/
         treeView.setRoot(root);
         treeView.setShowRoot(false);
         treeView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-/*----- When one treeItem is selected expand it and collapse all others -----*/
+        /*----- When one treeItem is selected expand it and collapse all others -----*/
         treeView.setOnMouseClicked(event -> {
             TreeItem selectedItem = treeView.getSelectionModel().getSelectedItem();
 
-            if (treeView.getSelectionModel().getSelectedIndices().isEmpty()) event.consume();
-            else if (root.getChildren().contains(selectedItem)) {
+            if (treeView.getSelectionModel().getSelectedIndices().isEmpty()) {
+                event.consume();
+            } else if (root.getChildren().contains(selectedItem)) {
                 for (TreeItem<String> treeItem : root.getChildren()) {
                     treeItem.setExpanded(false);
                 }
                 selectedItem.setExpanded(true);
 
-                if (selectedItem.equals(allDownloads)) listView.setItems(downloadsList);
-                else
+                if (selectedItem.equals(allDownloads)) {
+                    listView.setItems(downloadsList);
+                } else {
                     listView.setItems(downloadsList.filtered(cell -> cell.getData().state.getValue().equals(selectedItem.getValue())));
+                }
             } else {
                 if (selectedItem.getParent().equals(allDownloads)) {
                     listView.setItems(downloadsList.filtered(cell -> selectedItem.getValue().equals(cell.getType())));
@@ -187,7 +191,7 @@ public class layoutController implements Initializable {
     private void initDownloadsList() {
         downloadsList = FXCollections.observableArrayList();
         stateManager.readFromFile().stream().forEach((next) -> {
-            DownloaderCell downloader = new DownloaderCell(next, client);
+            DownloaderCell downloader = new DownloaderCell(next, client, threadService);
             downloadsList.add(downloader);
             downloader.set();
         });
@@ -208,5 +212,29 @@ public class layoutController implements Initializable {
             }
         });
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        listView.setOnMouseClicked((MouseEvent event) -> {
+            if (!listView.getSelectionModel().getSelectedItems().isEmpty()) {
+                for (DownloaderCell cell : downloadsList) {
+                    if (listView.getSelectionModel().getSelectedItems().contains(cell)) {
+                        cell.selectCheckBox(true);
+                    }
+                    else{
+                        cell.selectCheckBox(false);
+                    }
+                }
+            }
+        });
     }
 }
+
+
+
+
+/* ----- Download Links -----*/
+// http://softlayer-sng.dl.sourceforge.net/project/elementaryos/unstable/elementaryos-unstable-amd64.20140810.iso
+// https://www.google.com/calendar/ical/tk5scqbfe80ffdcfj86uppbhvk%40group.calendar.google.com/private-0dfe7855fa8b78365041b2b27261446e/basic.ics
+// http://downloads.sourceforge.net/project/sevenzip/7-Zip/9.22/7z922.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fsevenzip%2F&ts=1415925898&use_mirror=kaz
+// http://software-files-a.cnet.com/s/software/13/91/24/11/avast_free_antivirus_setup_online.exe?token=1417263074_0969cea50d1231fcf1d9c961806461d7&fileName=avast_free_antivirus_setup_online.exe
+// http://downloads.sourceforge.net/project/openofficeorg.mirror/4.1.1/binaries/en-US/Apache_OpenOffice_4.1.1_Linux_x86-64_install-rpm_en-US.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fopenofficeorg.mirror%2F%3Fsource%3Ddirectory-featured&ts=1417228120&use_mirror=softlayer-sng
+// http://downloads.sourceforge.net/project/nagios/nagios-4.x/nagios-4.0.8/nagios-4.0.8.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fdirectory%2Fbusiness-enterprise%2Fos%3Alinux%2Ffreshness%3Arecently-updated%2F&ts=1417228511&use_mirror=softlayer-sng
+        

@@ -16,28 +16,30 @@ import java.util.logging.Logger;
  */
 public class Utilities {
   // TODO: how to get file name from content?
-  public static String getFromURI(String url, String required) {
+  public static String getFromURI(String uri, URI required) {
     String fileName;
     String param;
-    int slashIndex = url.lastIndexOf("/");
-    int qIndex = url.lastIndexOf("?");
+    int slashIndex = uri.lastIndexOf("/");
+    int qIndex = uri.lastIndexOf("?");
     if (qIndex > slashIndex) { //if it has parameters
-      fileName = url.substring(slashIndex + 1, qIndex);
-      param = url.substring(qIndex);
+      fileName = uri.substring(slashIndex + 1, qIndex);
+      param = uri.substring(qIndex);
     } else {
-      fileName = url.substring(slashIndex + 1);
+      fileName = uri.substring(slashIndex + 1);
       param = "";
     }
     switch (required) {
-      case "param":
+      case PARAM:
         return param;
-      case "filename.ext":
+      case FILENAME_EXT:
         return fileName;
-      case "filename":
+      case FILENAME:
         if (fileName.contains(".")) return fileName.substring(0, fileName.lastIndexOf("."));
         else return fileName;
-      case "ext":
+      case EXT:
         return fileName.substring(fileName.lastIndexOf(".") + 1);
+      case WITHOUT_PARAM:
+          return uri.substring(0, qIndex);
       default:
         return fileName;
     }

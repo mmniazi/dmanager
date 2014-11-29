@@ -7,6 +7,10 @@
     -fx-background-color: #f9f9f9;
 }
 
+.list-cell:selected {
+    -fx-background-color: #f9f9f9;
+}
+
 .list-view {
     -fx-background-color: #f9f9f9;
 }

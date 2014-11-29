@@ -12,7 +12,7 @@
                 <Font name="Lato Regular" size="13.0" />
             </font>
         </Label>
-        <ProgressBar fx:id="progressBar" layoutX="34.0" layoutY="32.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mouseTransparent="true" pickOnBounds="false" prefHeight="5.0" prefWidth="390.0" progress="0.36" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="34.0" AnchorPane.topAnchor="35.0" />
+        <ProgressBar fx:id="progressBar" layoutX="34.0" layoutY="32.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mouseTransparent="true" pickOnBounds="false" prefHeight="5.0" prefWidth="390.0" progress="0.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="34.0" AnchorPane.topAnchor="35.0" />
         <Label fx:id="statusLabel" alignment="CENTER" layoutX="303.0" layoutY="17.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mouseTransparent="true" pickOnBounds="false" prefHeight="16.0" prefWidth="120.0" styleClass="statusLabel" textAlignment="CENTER" AnchorPane.leftAnchor="300.0" AnchorPane.topAnchor="15.0">
             <font>
                 <Font name="Lato Regular" size="13.0" />
@@ -38,7 +38,7 @@
                 <Font name="Lato Regular" size="13.0" />
             </font>
         </Button>
-        <CheckBox fx:id="checkBox" layoutX="8.0" layoutY="20.0" mnemonicParsing="false" selected="true" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="20.0" />
+        <CheckBox fx:id="checkBox" layoutX="8.0" layoutY="20.0" mnemonicParsing="false" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="20.0" />
         <Label fx:id="sDoneLabel" alignment="CENTER" layoutX="300.0" layoutY="-94.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mouseTransparent="true" pickOnBounds="false" prefHeight="15.0" prefWidth="75.0" textAlignment="CENTER" AnchorPane.leftAnchor="300.0" AnchorPane.topAnchor="15.0">
             <font>
                 <Font name="Lato Regular" size="13.0" />
