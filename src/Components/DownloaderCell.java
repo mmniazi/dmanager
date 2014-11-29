@@ -64,15 +64,14 @@ public class DownloaderCell extends ListCell {
     @FXML
     private Label fileLabel, sDoneLabel, sTotalLabel, timeLabel, speedLabel, statusLabel;
 
-    public DownloaderCell(StateData data, CloseableHttpClient client) {
+    public DownloaderCell(StateData data, CloseableHttpClient client, ExecutorService threadService) {
         this.data = data;
         this.currentBytes = data.bytesDone.get();
         this.client = client;
-        this.threadService = Executors.newCachedThreadPool();
+        this.threadService = threadService;
         type = Utilities.findType(Utilities.getFromURI(data.uri.toString(), URI.EXT));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/ListCell.fxml"));
         fxmlLoader.setController(this);
-        System.out.println(data.uri);
         try {
             fxmlLoader.load();
         } catch (IOException e) {
@@ -83,8 +82,8 @@ public class DownloaderCell extends ListCell {
     // TODO: Check for user permissions for file(in fact there is a method to add administrator rights to your application)
     // TODO: Check performance of program.
     public void set() {
-        // Setting data
         preSetGui();
+        defaultButton.setDisable(false);
         switch (data.state) {
 
             case SHDLED:
@@ -154,6 +153,7 @@ public class DownloaderCell extends ListCell {
     }
 
     public void stopDownload() {
+        defaultButton.setDisable(true);
         data.state = State.PAUSED;
         try {
             fileChannel.close();
@@ -162,13 +162,9 @@ public class DownloaderCell extends ListCell {
             Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
         }
         stateManager.changeState(data, "saveState");
-        threadService.shutdown();
         Platform.runLater(this::set);
     }
 
-    //TODO: make sure every thread ends on end what ever the case
-    //TODO: On resuming the download speed haves, maybe using a separate client will help
-    //TODO: InshaAllah I wil be creating a separate threadservice for each cell and then ending that service using application thread and then as usual set method will be called on application thread
     // TODO: -1 is returned when i try to download calendar data from link.
     // TODO: if download is paused and resumed instantly then java.io.IOException: Stream Closed is thrown
     // TODO: if download is paused while connecting.
@@ -199,8 +195,8 @@ public class DownloaderCell extends ListCell {
                 if (segmentsResponse.getStatusLine().getStatusCode() != 206) {
                     data.segments = 1;
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ex) {
+                Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
             }
 
             if (data.segments == 1) {
@@ -248,8 +244,8 @@ public class DownloaderCell extends ListCell {
             fileLabel.setText(data.fileName);
             sDoneLabel.setText(Utilities.sizeConverter(data.bytesDone.get()));
             sTotalLabel.setText(Utilities.sizeConverter(data.sizeOfFile));
-            progressBar.setProgress(data.bytesDone.get() / data.sizeOfFile);
-            statusLabel.setText("(" + (data.bytesDone.get() / data.sizeOfFile) * 100 + "%" + ")");
+            progressBar.setProgress(data.bytesDone.floatValue()/ data.sizeOfFile);
+            statusLabel.setText("(" + ((data.bytesDone.get()* 100) / data.sizeOfFile)  + "%" + ")");
         }
     }
 
@@ -257,11 +253,11 @@ public class DownloaderCell extends ListCell {
     private void update() {
         threadService.execute(() -> {
             List<Float> list = new ArrayList<>();
-            do {
+            while (data.state == State.ACTIVE) {
                 try {
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 stateManager.changeState(data, "saveState");
                 float averageSpeed = 0;
@@ -278,7 +274,6 @@ public class DownloaderCell extends ListCell {
                 averageSpeed /= list.size();
                 // Updating Gui //
                 final float finalAverageSpeed = averageSpeed;
-
                 Platform.runLater(() -> {
                     if (data.sizeOfFile == 0) {
                         speedLabel.setText("");
@@ -305,7 +300,7 @@ public class DownloaderCell extends ListCell {
                         statusLabel.setText("(" + (data.bytesDone.get() * 100) / data.sizeOfFile + "%" + ")");
                     }
                 });
-            } while (data.state.equals(State.ACTIVE) && data.bytesDone.get() != data.sizeOfFile);
+            }
         });
     }
 
@@ -355,10 +350,8 @@ public class DownloaderCell extends ListCell {
         @Override
         public void run() {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-            // TODO: complete method is not being called
             try {
                 HttpGet get = new HttpGet(data.uri);
-                // Range header for defining which segment of file we want to receive.
                 String byteRange = data.initialState.get(name) + "-" + data.finalState.get(name);
                 get.setHeader("Range", "bytes=" + byteRange);
                 CloseableHttpResponse response = client.execute(get);
@@ -387,7 +380,7 @@ public class DownloaderCell extends ListCell {
                 if (data.bytesDone.get() == data.sizeOfFile) {
                     complete();
                 }
-                // Algorithm for dynamic segmentation.
+                
                 if (data.state.equals(State.ACTIVE)) {
                     for (int i = 0; i < data.initialState.length(); i++) {
                         delta = data.finalState.get(i) - data.initialState.get(i);
