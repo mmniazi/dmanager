@@ -1,6 +1,6 @@
 .button {
     -fx-background-radius: 0;
-    -fx-background-color: #f39c12;
+    -fx-background-color: #333333;
 }
 
 .progress-bar .bar {
@@ -8,7 +8,7 @@
     -fx-border-radius: 0;
     -fx-padding: 1px;
     -fx-background-insets: 0;
-    -fx-background-color: #3498db;
+    -fx-background-color: #3fb19b;
 }
 
 .progress-bar .track {
