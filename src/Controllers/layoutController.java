@@ -4,8 +4,8 @@ import Components.AddPopUp;
 import Components.DownloaderCell;
 import States.StateData;
 import States.StateManagement;
+import Util.State;
 import Util.Utilities;
-import com.sun.javafx.property.adapter.PropertyDescriptor;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -30,16 +30,13 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.scene.input.MouseEvent;
 
 /**
  * @author muhammad
  */
 public class layoutController implements Initializable {
+
     ExecutorService threadService;
     ObservableList<DownloaderCell> downloadsList;
     PoolingHttpClientConnectionManager connectionManager;
@@ -59,7 +56,8 @@ public class layoutController implements Initializable {
     private AnchorPane MainWindow;
     @FXML
     private TreeView<String> treeView;
-    private String prButtonState = "pause";
+
+    ButtonState prButtonState = ButtonState.RESUMED;
 
     @FXML
     private void addButtonController(ActionEvent actionEvent) {
@@ -79,15 +77,19 @@ public class layoutController implements Initializable {
     @FXML
     private void prButtonController(ActionEvent actionEvent) {
         switch (prButtonState) {
-            case "pause":
-                prButtonState = "resume";
-                prButton.setText(prButtonState);
-                System.out.println(
-                listView.getSelectionModel().getSelectedIndices());
+            case PAUSED:
+                for (DownloaderCell cell : listView.getSelectionModel().getSelectedItems()) {
+                    cell.stopDownload();
+                }
+                prButtonState = ButtonState.RESUMED;
+                prButton.setId("ResumeButton");
                 break;
-            case "resume":
-                prButtonState = "pause";
-                prButton.setText(prButtonState);
+            case RESUMED:
+                for (DownloaderCell cell : listView.getSelectionModel().getSelectedItems()) {
+                    cell.startDownload();
+                }
+                prButtonState = ButtonState.PAUSED;
+                prButton.setId("PauseButton");
                 break;
         }
     }
@@ -113,7 +115,7 @@ public class layoutController implements Initializable {
         initDownloadsList();
         initCategoriesTree();
     }
-    
+
     // TODO: create post about how to create a treeView with only single expanded treeItem
     // TODO: add animations to treeView
     // TODO: make pr and delete button work and make mechanism for toggling check box when selecting list cells
@@ -211,24 +213,30 @@ public class layoutController implements Initializable {
                 }
             }
         });
+        // TODO: if a cell is selected and is active then pause button changes color from black to red also pr button is not working fix it
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.setOnMouseClicked((MouseEvent event) -> {
-            if (!listView.getSelectionModel().getSelectedItems().isEmpty()) {
+            ObservableList<DownloaderCell> selectedCells = listView.getSelectionModel().getSelectedItems();
+            if (!selectedCells.isEmpty()) {
                 for (DownloaderCell cell : downloadsList) {
                     if (listView.getSelectionModel().getSelectedItems().contains(cell)) {
                         cell.selectCheckBox(true);
-                    }
-                    else{
+                    } else {
                         cell.selectCheckBox(false);
+                    }
+                }
+
+                for (DownloaderCell cell : selectedCells) {
+                    if (cell.getData().state == State.ACTIVE) {
+                        prButtonState = ButtonState.PAUSED;
+                        prButton.setId("PauseButton");
+                        break;
                     }
                 }
             }
         });
     }
 }
-
-
-
 
 /* ----- Download Links -----*/
 // http://softlayer-sng.dl.sourceforge.net/project/elementaryos/unstable/elementaryos-unstable-amd64.20140810.iso
@@ -237,4 +245,4 @@ public class layoutController implements Initializable {
 // http://software-files-a.cnet.com/s/software/13/91/24/11/avast_free_antivirus_setup_online.exe?token=1417263074_0969cea50d1231fcf1d9c961806461d7&fileName=avast_free_antivirus_setup_online.exe
 // http://downloads.sourceforge.net/project/openofficeorg.mirror/4.1.1/binaries/en-US/Apache_OpenOffice_4.1.1_Linux_x86-64_install-rpm_en-US.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fopenofficeorg.mirror%2F%3Fsource%3Ddirectory-featured&ts=1417228120&use_mirror=softlayer-sng
 // http://downloads.sourceforge.net/project/nagios/nagios-4.x/nagios-4.0.8/nagios-4.0.8.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fdirectory%2Fbusiness-enterprise%2Fos%3Alinux%2Ffreshness%3Arecently-updated%2F&ts=1417228511&use_mirror=softlayer-sng
-        
+

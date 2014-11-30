@@ -22,7 +22,6 @@ import javafx.scene.layout.AnchorPane;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -83,7 +82,6 @@ public class DownloaderCell extends ListCell {
     // TODO: Check performance of program.
     public void set() {
         preSetGui();
-        defaultButton.setDisable(false);
         switch (data.state) {
 
             case SHDLED:
@@ -152,8 +150,14 @@ public class DownloaderCell extends ListCell {
         }
     }
 
+    public void startDownload(){
+        data.state = State.ACTIVE;
+        Platform.runLater(this::set);
+        connect();
+        update();
+    }
+    
     public void stopDownload() {
-        defaultButton.setDisable(true);
         data.state = State.PAUSED;
         try {
             fileChannel.close();

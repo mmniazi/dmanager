@@ -21,6 +21,7 @@
 }
 
 .check-box > .box {
+    -fx-background-color: #f9f9f9;
     -fx-background-insets: 0;
     -fx-background-radius: 0;
     -fx-background-color: transparent;
@@ -28,6 +29,7 @@
 }
 
 .check-box > .box > .mark {
+    -fx-background-color: #f9f9f9;
     -fx-background-image: url("../resources/Green.png");
     -fx-padding: 8;
     -fx-shape: null;
@@ -36,6 +38,7 @@
 }
 
 .check-box:selected > .box > .mark {
+    -fx-background-color: #f9f9f9;
     -fx-background-image: url("../resources/GreenSelected.png");
     -fx-padding: 10;
     -fx-background-repeat: round
