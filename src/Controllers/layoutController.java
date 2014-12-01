@@ -30,6 +30,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -213,25 +214,31 @@ public class layoutController implements Initializable {
                 }
             }
         });
-        // TODO: if a cell is selected and is active then pause button changes color from black to red also pr button is not working fix it
+        // inshaAllah going to build that hover effect I first designed
+        // TODO: if chck box is selected then cell is selected
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.setOnMouseClicked((MouseEvent event) -> {
             ObservableList<DownloaderCell> selectedCells = listView.getSelectionModel().getSelectedItems();
             if (!selectedCells.isEmpty()) {
                 for (DownloaderCell cell : downloadsList) {
                     if (listView.getSelectionModel().getSelectedItems().contains(cell)) {
-                        cell.selectCheckBox(true);
+                        cell.setCheckBoxValue(true);
                     } else {
-                        cell.selectCheckBox(false);
+                        cell.setCheckBoxValue(false);
                     }
                 }
-
+                int activeCounter = 0;
                 for (DownloaderCell cell : selectedCells) {
                     if (cell.getData().state == State.ACTIVE) {
+                        activeCounter++;
                         prButtonState = ButtonState.PAUSED;
                         prButton.setId("PauseButton");
                         break;
                     }
+                }
+                if (activeCounter == 0) {
+                    prButtonState = ButtonState.RESUMED;
+                    prButton.setId("ResumeButton");
                 }
             }
         });

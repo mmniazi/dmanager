@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  * @author muhammad
  */
 public class DownloaderCell extends ListCell {
-
+// TODO: convert all executables to callable and create seprate threadservices and maybe I need a proper ThreadFactory
     private StateManagement stateManager = StateManagement.getInstance();
     private StateData data;
     private RandomAccessFile file;
@@ -317,7 +317,6 @@ public class DownloaderCell extends ListCell {
             Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
         }
         stateManager.changeState(data, "saveState");
-        threadService.shutdown();
         Platform.runLater(this::set);
     }
 
@@ -330,9 +329,14 @@ public class DownloaderCell extends ListCell {
         return cell;
     }
 
-    public void selectCheckBox(boolean bool) {
+    public void setCheckBoxValue(boolean bool) {
         checkBox.setSelected(bool);
     }
+
+    public boolean getCheckBoxValue(){
+        return checkBox.isSelected();
+    }
+            
 
     public String getType() {
         return type;
@@ -341,7 +345,6 @@ public class DownloaderCell extends ListCell {
     public StateData getData() {
         return data;
     }
-
     private class Segment implements Runnable {
 
         long delta;
