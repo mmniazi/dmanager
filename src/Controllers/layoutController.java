@@ -77,7 +77,7 @@ public class layoutController implements Initializable {
                 stateManager.changeState(data, "createState");
                 downloader.set();
             } else {
-
+                System.out.println("Already in list");
             }
         });
     }
