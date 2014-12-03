@@ -71,7 +71,7 @@ public class layoutController implements Initializable {
 
             if (downloadsList.stream().noneMatch(predicate)) {
                 StateData data = new StateData(System.getProperty("user.home") + "/", URI.create(uri),
-                        Utilities.getFromURI(uri, Util.URI.FILENAME_EXT), 1);
+                        Utilities.getFromURI(uri, Util.URI.FILENAME_EXT), 10);
                 DownloaderCell downloader = new DownloaderCell(data, client, threadService);
                 downloadsList.add(downloader);
                 stateManager.changeState(data, "createState");

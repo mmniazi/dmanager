@@ -43,7 +43,8 @@ import java.util.logging.Logger;
  * @author muhammad
  */
 public class DownloaderCell extends ListCell {
-    // TODO: convert all executables to callable and create seprate threadservices and maybe I need a proper ThreadFactory
+    // TODO: convert all executable to callable and create seprate threadservices and maybe I need a proper ThreadFactory
+    // TODO: create a mechanism that will stop download being paused and resumed to quickly && resuming of already completed downloads
     private StateManagement stateManager = StateManagement.getInstance();
     private StateData data;
     private RandomAccessFile file;
@@ -228,7 +229,6 @@ public class DownloaderCell extends ListCell {
     }
 
     private void start() {
-        // TODO: chck why its not working for 1 segment @arrayoutofboundexception
         for (int i = 0; i < data.segments; i++) {
             if (data.initialState.get(i) < data.finalState.get(i)) {
                 threadService.execute(new Segment(i));
