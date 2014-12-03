@@ -66,12 +66,19 @@ public class layoutController implements Initializable {
         popUp.startButton.addEventHandler(ActionEvent.ACTION, (ActionEvent event) -> {
             String uri = popUp.uriField.getText();
             popUp.popupWindow.hide();
-            StateData data = new StateData(System.getProperty("user.home") + "/", URI.create(uri),
-                    Utilities.getFromURI(uri, Util.URI.FILENAME_EXT), 10);
-            DownloaderCell downloader = new DownloaderCell(data, client, threadService);
-            downloadsList.add(downloader);
-            stateManager.changeState(data, "createState");
-            downloader.set();
+
+            Predicate<DownloaderCell> predicate = cell -> cell.getData().uri.toString().equalsIgnoreCase(uri);
+
+            if (downloadsList.stream().noneMatch(predicate)) {
+                StateData data = new StateData(System.getProperty("user.home") + "/", URI.create(uri),
+                        Utilities.getFromURI(uri, Util.URI.FILENAME_EXT), 10);
+                DownloaderCell downloader = new DownloaderCell(data, client, threadService);
+                downloadsList.add(downloader);
+                stateManager.changeState(data, "createState");
+                downloader.set();
+            } else {
+
+            }
         });
     }
 
@@ -167,68 +174,52 @@ public class layoutController implements Initializable {
         treeView.setOnMouseClicked(event -> {
             TreeItem<String> selectedItem = treeView.getSelectionModel().getSelectedItem();
 
-            if (treeView.getSelectionModel().getSelectedIndices().isEmpty()) {
+            if (treeView.getSelectionModel().getSelectedIndices().isEmpty())
                 event.consume();
-            } else if (root.getChildren().contains(selectedItem)) {
-                for (TreeItem<String> treeItem : root.getChildren()) {
+            else if (root.getChildren().contains(selectedItem)) {
+                for (TreeItem<String> treeItem : root.getChildren())
                     treeItem.setExpanded(false);
-                }
+
                 selectedItem.setExpanded(true);
 
-                if (selectedItem.equals(allDownloads)) {
+                if (selectedItem.equals(allDownloads))
                     listView.setItems(downloadsList);
-                } else {
-                    listView.setItems(downloadsList.filtered(cell -> cell.getData().state.getValue().equals(selectedItem.getValue())));
-                }
+
+                else
+                    listView.setItems(downloadsList.filtered(cell -> cell.getData().state.getValue()
+                            .equals(selectedItem.getValue())));
+
             } else {
-                if (selectedItem.getParent().equals(allDownloads)) {
+                if (selectedItem.getParent().equals(allDownloads))
                     listView.setItems(downloadsList.filtered(cell -> selectedItem.getValue().equals(cell.getType())));
-                } else {
-                    listView.setItems(downloadsList.filtered(cell -> selectedItem.getParent().getValue().equals(cell.getData().state.getValue())
+                else
+                    listView.setItems(downloadsList.filtered(cell -> selectedItem.getParent().getValue()
+                            .equals(cell.getData().state.getValue())
                             && selectedItem.getValue().equals(cell.getType())));
-                }
             }
         });
     }
 
     private void initDownloadsList() {
         downloadsList = FXCollections.observableArrayList();
+        // inshaAllah going to build that hover effect I first designed
+        // TODO: if chck box is selected then cell is selected use list change listener
+        // TODO: make sure one download exists only one time
         downloadsList.addListener((ListChangeListener<DownloaderCell>) change -> {
             if (change.next()) {
                 if (change.wasAdded()) {
                     change.getAddedSubList().forEach(cell -> cell.getCheckBox().setOnMouseClicked(event -> {
                         if (cell.getCheckBoxValue())
                             listView.getSelectionModel().select(cell);
-                        else listView.getSelectionModel().clearSelection(cell.getIndex());
+                        else
+                            listView.getSelectionModel().clearSelection(
+                                    listView.getSelectionModel().getSelectedItems().indexOf(cell));
                     }));
                 }
             }
         });
-        stateManager.readFromFile().stream().forEach((next) -> {
-            DownloaderCell downloader = new DownloaderCell(next, client, threadService);
-            downloadsList.add(downloader);
-            downloader.set();
-        });
-        listView.setItems(downloadsList);
-        AnchorPane emptyCell = new AnchorPane();
-        emptyCell.setBackground(new Background(new BackgroundFill(
-                Paint.valueOf("#f9f9f9"), CornerRadii.EMPTY, Insets.EMPTY)));
-        emptyCell.setPrefSize(800, 60);
-        listView.setCellFactory(ListView -> new ListCell<DownloaderCell>() {
-            @Override
-            protected void updateItem(DownloaderCell item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(emptyCell);
-                } else {
-                    setGraphic(item.getCell());
-                }
-            }
-        });
-        // inshaAllah going to build that hover effect I first designed
-        // TODO: if chck box is selected then cell is selected use list change listener
-        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.getSelectionModel().getSelectedItems()
                 .addListener((ListChangeListener<DownloaderCell>) change -> {
                     if (change.next()) {
@@ -250,6 +241,30 @@ public class layoutController implements Initializable {
                         }
                     }
                 });
+
+        AnchorPane emptyCell = new AnchorPane();
+        emptyCell.setBackground(new Background(new BackgroundFill(
+                Paint.valueOf("#f9f9f9"), CornerRadii.EMPTY, Insets.EMPTY)));
+        emptyCell.setPrefSize(800, 60);
+        listView.setCellFactory(ListView -> new ListCell<DownloaderCell>() {
+            @Override
+            protected void updateItem(DownloaderCell item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(emptyCell);
+                } else {
+                    setGraphic(item.getCell());
+                }
+            }
+        });
+
+        stateManager.readFromFile().stream().forEach((next) -> {
+            DownloaderCell downloader = new DownloaderCell(next, client, threadService);
+            downloadsList.add(downloader);
+            downloader.set();
+        });
+        listView.setItems(downloadsList);
+
     }
 }
 
