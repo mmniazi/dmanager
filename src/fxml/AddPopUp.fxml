@@ -35,7 +35,7 @@
         </Label>
         <TextField fx:id="uriField" layoutX="80.0" layoutY="18.0" prefHeight="25.0"
                    prefWidth="415.0"
-                   text="http://downloads.sourceforge.net/project/nagios/nagios-4.x/nagios-4.0.8/nagios-4.0.8.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fdirectory%2Fbusiness-enterprise%2Fos%3Alinux%2Ffreshness%3Arecently-updated%2F&amp;ts=1417228511&amp;use_mirror=softlayer-sng"
+                   text="http://softlayer-sng.dl.sourceforge.net/project/elementaryos/unstable/elementaryos-unstable-amd64.20140810.iso"
                    AnchorPane.leftAnchor="90.0" AnchorPane.rightAnchor="210.0" AnchorPane.topAnchor="15.0"/>
         <TextField fx:id="nameField" layoutX="80.0" layoutY="62.0" prefHeight="25.0" prefWidth="415.0"
                    AnchorPane.bottomAnchor="62.0" AnchorPane.leftAnchor="90.0" AnchorPane.rightAnchor="210.0"

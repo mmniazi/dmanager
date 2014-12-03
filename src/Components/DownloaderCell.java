@@ -22,6 +22,7 @@ import javafx.scene.layout.AnchorPane;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
+
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -42,7 +43,7 @@ import java.util.logging.Logger;
  * @author muhammad
  */
 public class DownloaderCell extends ListCell {
-// TODO: convert all executables to callable and create seprate threadservices and maybe I need a proper ThreadFactory
+    // TODO: convert all executables to callable and create seprate threadservices and maybe I need a proper ThreadFactory
     private StateManagement stateManager = StateManagement.getInstance();
     private StateData data;
     private RandomAccessFile file;
@@ -150,13 +151,13 @@ public class DownloaderCell extends ListCell {
         }
     }
 
-    public void startDownload(){
+    public void startDownload() {
         data.state = State.ACTIVE;
         Platform.runLater(this::set);
         connect();
         update();
     }
-    
+
     public void stopDownload() {
         data.state = State.PAUSED;
         try {
@@ -248,8 +249,8 @@ public class DownloaderCell extends ListCell {
             fileLabel.setText(data.fileName);
             sDoneLabel.setText(Utilities.sizeConverter(data.bytesDone.get()));
             sTotalLabel.setText(Utilities.sizeConverter(data.sizeOfFile));
-            progressBar.setProgress(data.bytesDone.floatValue()/ data.sizeOfFile);
-            statusLabel.setText("(" + ((data.bytesDone.get()* 100) / data.sizeOfFile)  + "%" + ")");
+            progressBar.setProgress(data.bytesDone.floatValue() / data.sizeOfFile);
+            statusLabel.setText("(" + ((data.bytesDone.get() * 100) / data.sizeOfFile) + "%" + ")");
         }
     }
 
@@ -329,14 +330,18 @@ public class DownloaderCell extends ListCell {
         return cell;
     }
 
+    public boolean getCheckBoxValue() {
+        return checkBox.isSelected();
+    }
+
     public void setCheckBoxValue(boolean bool) {
         checkBox.setSelected(bool);
     }
 
-    public boolean getCheckBoxValue(){
-        return checkBox.isSelected();
+    public CheckBox getCheckBox() {
+        return checkBox;
     }
-            
+
 
     public String getType() {
         return type;
@@ -345,6 +350,7 @@ public class DownloaderCell extends ListCell {
     public StateData getData() {
         return data;
     }
+
     private class Segment implements Runnable {
 
         long delta;
@@ -387,7 +393,7 @@ public class DownloaderCell extends ListCell {
                 if (data.bytesDone.get() == data.sizeOfFile) {
                     complete();
                 }
-                
+
                 if (data.state.equals(State.ACTIVE)) {
                     for (int i = 0; i < data.initialState.length(); i++) {
                         delta = data.finalState.get(i) - data.initialState.get(i);

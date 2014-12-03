@@ -15,6 +15,6 @@ public enum URI {
     FILENAME(),
     EXT(),
     FILENAME_EXT(),
-    WITHOUT_PARAM;
+    WITHOUT_PARAM
 
 }

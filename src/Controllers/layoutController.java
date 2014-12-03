@@ -7,6 +7,7 @@ import States.StateManagement;
 import Util.State;
 import Util.Utilities;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,13 +26,13 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+
 import java.net.URI;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
-import javafx.scene.input.MouseEvent;
+import java.util.function.Predicate;
 
 /**
  * @author muhammad
@@ -43,6 +44,7 @@ public class layoutController implements Initializable {
     PoolingHttpClientConnectionManager connectionManager;
     CloseableHttpClient client;
     StateManagement stateManager;
+    ButtonState prButtonState = ButtonState.RESUMED;
     @FXML
     private Button exitButton;
     @FXML
@@ -57,8 +59,6 @@ public class layoutController implements Initializable {
     private AnchorPane MainWindow;
     @FXML
     private TreeView<String> treeView;
-
-    ButtonState prButtonState = ButtonState.RESUMED;
 
     @FXML
     private void addButtonController(ActionEvent actionEvent) {
@@ -127,20 +127,20 @@ public class layoutController implements Initializable {
 
         TreeItem<String> allDownloads
                 = new TreeItem<>("All Downloads", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/White.png"))));
+                getClass().getResourceAsStream("/resources/White.png"))));
         allDownloads.setExpanded(true);
         TreeItem<String> inProgress
                 = new TreeItem<>("Downloading", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Green.png"))));
+                getClass().getResourceAsStream("/resources/Green.png"))));
         TreeItem<String> completed
                 = new TreeItem<>("Completed", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Blue.png"))));
+                getClass().getResourceAsStream("/resources/Blue.png"))));
         TreeItem<String> paused
                 = new TreeItem<>("Paused", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Orange.png"))));
+                getClass().getResourceAsStream("/resources/Orange.png"))));
         TreeItem<String> failed
                 = new TreeItem<>("Failed", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Red.png"))));
+                getClass().getResourceAsStream("/resources/Red.png"))));
 // Adding all tree items to root item
         root.getChildren().addAll(allDownloads, completed, failed, inProgress, paused);
 
@@ -165,7 +165,7 @@ public class layoutController implements Initializable {
 
         /*----- When one treeItem is selected expand it and collapse all others -----*/
         treeView.setOnMouseClicked(event -> {
-            TreeItem selectedItem = treeView.getSelectionModel().getSelectedItem();
+            TreeItem<String> selectedItem = treeView.getSelectionModel().getSelectedItem();
 
             if (treeView.getSelectionModel().getSelectedIndices().isEmpty()) {
                 event.consume();
@@ -193,6 +193,17 @@ public class layoutController implements Initializable {
 
     private void initDownloadsList() {
         downloadsList = FXCollections.observableArrayList();
+        downloadsList.addListener((ListChangeListener<DownloaderCell>) change -> {
+            if (change.next()) {
+                if (change.wasAdded()) {
+                    change.getAddedSubList().forEach(cell -> cell.getCheckBox().setOnMouseClicked(event -> {
+                        if (cell.getCheckBoxValue())
+                            listView.getSelectionModel().select(cell);
+                        else listView.getSelectionModel().clearSelection(cell.getIndex());
+                    }));
+                }
+            }
+        });
         stateManager.readFromFile().stream().forEach((next) -> {
             DownloaderCell downloader = new DownloaderCell(next, client, threadService);
             downloadsList.add(downloader);
@@ -215,33 +226,30 @@ public class layoutController implements Initializable {
             }
         });
         // inshaAllah going to build that hover effect I first designed
-        // TODO: if chck box is selected then cell is selected
+        // TODO: if chck box is selected then cell is selected use list change listener
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        listView.setOnMouseClicked((MouseEvent event) -> {
-            ObservableList<DownloaderCell> selectedCells = listView.getSelectionModel().getSelectedItems();
-            if (!selectedCells.isEmpty()) {
-                for (DownloaderCell cell : downloadsList) {
-                    if (listView.getSelectionModel().getSelectedItems().contains(cell)) {
-                        cell.setCheckBoxValue(true);
-                    } else {
-                        cell.setCheckBoxValue(false);
+
+        listView.getSelectionModel().getSelectedItems()
+                .addListener((ListChangeListener<DownloaderCell>) change -> {
+                    if (change.next()) {
+
+                        if (change.wasRemoved())
+                            change.getRemoved().stream().forEach(cell -> cell.setCheckBoxValue(false));
+
+                        if (change.wasAdded())
+                            change.getAddedSubList().stream().forEach(cell -> cell.setCheckBoxValue(true));
+
+                        Predicate<DownloaderCell> predicate = cell -> cell.getData().state == State.ACTIVE;
+
+                        if (change.getList().stream().anyMatch(predicate)) {
+                            prButtonState = ButtonState.PAUSED;
+                            prButton.setId("PauseButton");
+                        } else {
+                            prButtonState = ButtonState.RESUMED;
+                            prButton.setId("ResumeButton");
+                        }
                     }
-                }
-                int activeCounter = 0;
-                for (DownloaderCell cell : selectedCells) {
-                    if (cell.getData().state == State.ACTIVE) {
-                        activeCounter++;
-                        prButtonState = ButtonState.PAUSED;
-                        prButton.setId("PauseButton");
-                        break;
-                    }
-                }
-                if (activeCounter == 0) {
-                    prButtonState = ButtonState.RESUMED;
-                    prButton.setId("ResumeButton");
-                }
-            }
-        });
+                });
     }
 }
 

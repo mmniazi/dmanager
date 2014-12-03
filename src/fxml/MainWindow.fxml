@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
-<AnchorPane id="BackgroundPane" fx:id="MainWindow" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@../css/MainWindow.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.layoutController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="BackgroundPane" fx:id="MainWindow" maxHeight="-Infinity"
+            maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@../css/MainWindow.css"
+            xmlns="http://javafx.com/javafx/8" fx:controller="Controllers.layoutController">
     <children>
         <ListView id="ListView" fx:id="listView" focusTraversable="false" layoutX="194.0" layoutY="119.0" prefHeight="470.0" prefWidth="819.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="100.0" />
         <TextField id="SearchBar" layoutX="768.0" layoutY="4.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="22.0" prefWidth="150.0" promptText="Search" AnchorPane.rightAnchor="85.0" AnchorPane.topAnchor="5.0" />

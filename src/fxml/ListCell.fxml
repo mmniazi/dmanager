@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-
-<AnchorPane fx:id="cell" focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false" prefHeight="60.0" prefWidth="800.0" styleClass="pane" stylesheets="@../css/ActiveCell.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" fx:id="cell" focusTraversable="true" maxHeight="-Infinity"
+            maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false" prefHeight="60.0"
+            prefWidth="800.0" styleClass="pane" stylesheets="@../css/ActiveCell.css" xmlns="http://javafx.com/javafx/8">
     <children>
         <Label fx:id="fileLabel" layoutX="40.0" layoutY="16.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mouseTransparent="true" pickOnBounds="false" prefHeight="15.0" prefWidth="250.0" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="15.0">
             <font>
