@@ -202,9 +202,8 @@ public class layoutController implements Initializable {
 
     private void initDownloadsList() {
         downloadsList = FXCollections.observableArrayList();
-        // inshaAllah going to build that hover effect I first designed
-        // TODO: if chck box is selected then cell is selected use list change listener
-        // TODO: make sure one download exists only one time
+        // TODO: inshaAllah going to build that hover effect I first designed
+        // TODO: inshaAllah, make color of prButton transition when cells are selected and if there is no selection then dont switch prButtonState.
         downloadsList.addListener((ListChangeListener<DownloaderCell>) change -> {
             if (change.next()) {
                 if (change.wasAdded()) {
