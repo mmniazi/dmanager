@@ -10,5 +10,5 @@ package Controllers;
  * @author muhammad
  */
 public enum ButtonState {
-    RESUMED(), PAUSEDACTIVE(), RESUMEDACTIVE();
+    RESUMED(), PAUSED()
 }

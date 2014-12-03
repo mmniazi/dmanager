@@ -210,16 +210,16 @@ public class DownloaderCell extends ListCell {
                 data.finalState.set(0, data.sizeOfFile);
             } else {
                 long sizeOfEachSegment = data.sizeOfFile / data.segments;
-                data.initialState = new AtomicLongArray(data.segments + 1);
-                data.finalState = new AtomicLongArray(data.segments + 1);
-                for (int i = 0; i < data.segments; i++) {
+                data.initialState = new AtomicLongArray(data.segments);
+                data.finalState = new AtomicLongArray(data.segments);
+                for (int i = 0; i < data.segments - 1; i++) {
                     data.initialState.set(i, i * sizeOfEachSegment);
                     data.finalState.set(i, (i + 1) * sizeOfEachSegment);
                 }
                 // assign remaining bytes to last segment.
                 data.initialState.set(
-                        data.segments, data.segments * sizeOfEachSegment);
-                data.finalState.set(data.segments, data.sizeOfFile);
+                        data.segments - 1, data.segments * sizeOfEachSegment);
+                data.finalState.set(data.segments - 1, data.sizeOfFile);
             }
             data.state = State.ACTIVE;
             stateManager.changeState(data, "saveState");
@@ -229,7 +229,7 @@ public class DownloaderCell extends ListCell {
 
     private void start() {
         // TODO: chck why its not working for 1 segment @arrayoutofboundexception
-        for (int i = 0; i <= data.segments; i++) {
+        for (int i = 0; i < data.segments; i++) {
             if (data.initialState.get(i) < data.finalState.get(i)) {
                 threadService.execute(new Segment(i));
             }

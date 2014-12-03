@@ -71,7 +71,7 @@ public class layoutController implements Initializable {
 
             if (downloadsList.stream().noneMatch(predicate)) {
                 StateData data = new StateData(System.getProperty("user.home") + "/", URI.create(uri),
-                        Utilities.getFromURI(uri, Util.URI.FILENAME_EXT), 10);
+                        Utilities.getFromURI(uri, Util.URI.FILENAME_EXT), 1);
                 DownloaderCell downloader = new DownloaderCell(data, client, threadService);
                 downloadsList.add(downloader);
                 stateManager.changeState(data, "createState");
@@ -87,21 +87,19 @@ public class layoutController implements Initializable {
     private void prButtonController(ActionEvent actionEvent) {
         if (!listView.getSelectionModel().isEmpty()) {
             switch (prButtonState) {
-                case RESUMED:
-                    break;
-                case PAUSEDACTIVE:
+                case PAUSED:
                     for (DownloaderCell cell : listView.getSelectionModel().getSelectedItems()) {
                         cell.stopDownload();
                     }
-                    prButtonState = ButtonState.RESUMEDACTIVE;
-                    prButton.setId("ResumeButtonActive");
+                    prButtonState = ButtonState.RESUMED;
+                    prButton.setId("ResumeButton");
                     break;
-                case RESUMEDACTIVE:
+                case RESUMED:
                     for (DownloaderCell cell : listView.getSelectionModel().getSelectedItems()) {
                         cell.startDownload();
                     }
-                    prButtonState = ButtonState.PAUSEDACTIVE;
-                    prButton.setId("PauseButtonActive");
+                    prButtonState = ButtonState.PAUSED;
+                    prButton.setId("PauseButton");
                     break;
             }
         }
@@ -139,20 +137,20 @@ public class layoutController implements Initializable {
 
         TreeItem<String> allDownloads
                 = new TreeItem<>("All Downloads", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/White.png"))));
+                getClass().getResourceAsStream("/resources/White.png"))));
         allDownloads.setExpanded(true);
         TreeItem<String> inProgress
                 = new TreeItem<>("Downloading", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Green.png"))));
+                getClass().getResourceAsStream("/resources/Green.png"))));
         TreeItem<String> completed
                 = new TreeItem<>("Completed", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Blue.png"))));
+                getClass().getResourceAsStream("/resources/Blue.png"))));
         TreeItem<String> paused
                 = new TreeItem<>("Paused", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Orange.png"))));
+                getClass().getResourceAsStream("/resources/Orange.png"))));
         TreeItem<String> failed
                 = new TreeItem<>("Failed", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Red.png"))));
+                getClass().getResourceAsStream("/resources/Red.png"))));
 // Adding all tree items to root item
         root.getChildren().addAll(allDownloads, completed, failed, inProgress, paused);
 
@@ -210,7 +208,6 @@ public class layoutController implements Initializable {
     private void initDownloadsList() {
         downloadsList = FXCollections.observableArrayList();
         // TODO: inshaAllah going to build that hover effect I first designed
-        // TODO: inshaAllah, make color of prButton transition when cells are selected and if there is no selection then dont switch prButtonState.
         downloadsList.addListener((ListChangeListener<DownloaderCell>) change -> {
             if (change.next()) {
                 if (change.wasAdded()) {
@@ -243,21 +240,13 @@ public class layoutController implements Initializable {
         listView.getSelectionModel().getSelectedItems()
                 .addListener((ListChangeListener<DownloaderCell>) change -> {
                     if (change.next()) {
-                        if (listView.getSelectionModel().isEmpty()) {
-                            System.out.println("asdsa");
+                        Predicate<DownloaderCell> predicate = cell -> cell.getData().state == State.ACTIVE;
+                        if (change.getList().stream().anyMatch(predicate)) {
+                            prButtonState = ButtonState.PAUSED;
+                            prButton.setId("PauseButton");
+                        } else {
                             prButtonState = ButtonState.RESUMED;
                             prButton.setId("ResumeButton");
-                            deleteButton.setId("DeleteButton");
-                        } else {
-                            deleteButton.setId("DeleteButtonActive");
-                            Predicate<DownloaderCell> predicate = cell -> cell.getData().state == State.ACTIVE;
-                            if (change.getList().stream().anyMatch(predicate)) {
-                                prButtonState = ButtonState.PAUSEDACTIVE;
-                                prButton.setId("PauseButtonActive");
-                            } else {
-                                prButtonState = ButtonState.RESUMEDACTIVE;
-                                prButton.setId("ResumeButtonActive");
-                            }
                         }
                     }
                 });
