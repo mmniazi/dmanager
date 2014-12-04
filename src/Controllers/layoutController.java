@@ -215,8 +215,7 @@ public class layoutController implements Initializable {
                         if (cell.getCheckBoxValue()) {
                             listView.getSelectionModel().select(cell);
                         } else {
-                            listView.getSelectionModel().clearSelection(
-                                    listView.getSelectionModel().getSelectedItems().indexOf(cell));
+                            listView.getSelectionModel().clearSelection(listView.getItems().indexOf(cell));
                         }
                     }));
                 }
@@ -229,11 +228,13 @@ public class layoutController implements Initializable {
                     if (change.next()) {
 
                         if (change.wasRemoved()) {
-                            change.getRemoved().stream().forEach(cell -> cell.setCheckBoxValue(false));
+                            change.getRemoved().stream().forEach(cell -> {
+                                cell.setCheckBoxValue(false);});
                         }
 
                         if (change.wasAdded()) {
-                            change.getAddedSubList().stream().forEach(cell -> cell.setCheckBoxValue(true));
+                            change.getAddedSubList().stream().forEach(cell -> {
+                                cell.setCheckBoxValue(true);});
                         }
                     }
                 });
