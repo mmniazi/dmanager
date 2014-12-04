@@ -56,16 +56,29 @@
     -fx-graphic: url(../resources/AddButton.png);
 }
 
-#PauseButton {
-    -fx-graphic: url(../resources/PauseButton.png);
+#AddButtonActive {
+    -fx-graphic: url(../resources/AddButtonActive.png);
 }
 
 #ResumeButton {
     -fx-graphic: url(../resources/ResumeButton.png);
 }
 
+#ResumeButtonActive {
+    -fx-graphic: url(../resources/ResumeButtonActive.png);
+}
+
+
+#PauseButtonActive {
+    -fx-graphic: url(../resources/PauseButtonActive.png);
+}
+
 #DeleteButton {
     -fx-graphic: url(../resources/DeleteButton.png);
+}
+
+#DeleteButtonActive {
+    -fx-graphic: url(../resources/DeleteButtonActive.png);
 }
 
 #MinimizeButton {

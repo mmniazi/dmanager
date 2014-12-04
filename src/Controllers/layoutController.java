@@ -77,6 +77,7 @@ public class layoutController implements Initializable {
                 stateManager.changeState(data, "createState");
                 downloader.set();
             } else {
+                //TODO: handle already in list
                 System.out.println("Already in list");
             }
         });
@@ -84,21 +85,25 @@ public class layoutController implements Initializable {
 
     @FXML
     private void prButtonController(ActionEvent actionEvent) {
-        switch (prButtonState) {
-            case PAUSED:
-                for (DownloaderCell cell : listView.getSelectionModel().getSelectedItems()) {
-                    cell.stopDownload();
-                }
-                prButtonState = ButtonState.RESUMED;
-                prButton.setId("ResumeButton");
-                break;
-            case RESUMED:
-                for (DownloaderCell cell : listView.getSelectionModel().getSelectedItems()) {
-                    cell.startDownload();
-                }
-                prButtonState = ButtonState.PAUSED;
-                prButton.setId("PauseButton");
-                break;
+        if (!listView.getSelectionModel().isEmpty()) {
+            switch (prButtonState) {
+                case RESUMED:
+                    break;
+                case PAUSEDACTIVE:
+                    for (DownloaderCell cell : listView.getSelectionModel().getSelectedItems()) {
+                        cell.stopDownload();
+                    }
+                    prButtonState = ButtonState.RESUMEDACTIVE;
+                    prButton.setId("ResumeButtonActive");
+                    break;
+                case RESUMEDACTIVE:
+                    for (DownloaderCell cell : listView.getSelectionModel().getSelectedItems()) {
+                        cell.startDownload();
+                    }
+                    prButtonState = ButtonState.PAUSEDACTIVE;
+                    prButton.setId("PauseButtonActive");
+                    break;
+            }
         }
     }
 
@@ -134,20 +139,20 @@ public class layoutController implements Initializable {
 
         TreeItem<String> allDownloads
                 = new TreeItem<>("All Downloads", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/White.png"))));
+                                        getClass().getResourceAsStream("/resources/White.png"))));
         allDownloads.setExpanded(true);
         TreeItem<String> inProgress
                 = new TreeItem<>("Downloading", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/Green.png"))));
+                                        getClass().getResourceAsStream("/resources/Green.png"))));
         TreeItem<String> completed
                 = new TreeItem<>("Completed", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/Blue.png"))));
+                                        getClass().getResourceAsStream("/resources/Blue.png"))));
         TreeItem<String> paused
                 = new TreeItem<>("Paused", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/Orange.png"))));
+                                        getClass().getResourceAsStream("/resources/Orange.png"))));
         TreeItem<String> failed
                 = new TreeItem<>("Failed", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/Red.png"))));
+                                        getClass().getResourceAsStream("/resources/Red.png"))));
 // Adding all tree items to root item
         root.getChildren().addAll(allDownloads, completed, failed, inProgress, paused);
 
@@ -174,28 +179,30 @@ public class layoutController implements Initializable {
         treeView.setOnMouseClicked(event -> {
             TreeItem<String> selectedItem = treeView.getSelectionModel().getSelectedItem();
 
-            if (treeView.getSelectionModel().getSelectedIndices().isEmpty())
+            if (treeView.getSelectionModel().getSelectedIndices().isEmpty()) {
                 event.consume();
-            else if (root.getChildren().contains(selectedItem)) {
-                for (TreeItem<String> treeItem : root.getChildren())
+            } else if (root.getChildren().contains(selectedItem)) {
+                for (TreeItem<String> treeItem : root.getChildren()) {
                     treeItem.setExpanded(false);
+                }
 
                 selectedItem.setExpanded(true);
 
-                if (selectedItem.equals(allDownloads))
+                if (selectedItem.equals(allDownloads)) {
                     listView.setItems(downloadsList);
-
-                else
+                } else {
                     listView.setItems(downloadsList.filtered(cell -> cell.getData().state.getValue()
                             .equals(selectedItem.getValue())));
+                }
 
             } else {
-                if (selectedItem.getParent().equals(allDownloads))
+                if (selectedItem.getParent().equals(allDownloads)) {
                     listView.setItems(downloadsList.filtered(cell -> selectedItem.getValue().equals(cell.getType())));
-                else
+                } else {
                     listView.setItems(downloadsList.filtered(cell -> selectedItem.getParent().getValue()
                             .equals(cell.getData().state.getValue())
                             && selectedItem.getValue().equals(cell.getType())));
+                }
             }
         });
     }
@@ -208,39 +215,52 @@ public class layoutController implements Initializable {
             if (change.next()) {
                 if (change.wasAdded()) {
                     change.getAddedSubList().forEach(cell -> cell.getCheckBox().setOnMouseClicked(event -> {
-                        if (cell.getCheckBoxValue())
+                        if (cell.getCheckBoxValue()) {
                             listView.getSelectionModel().select(cell);
-                        else
+                        } else {
                             listView.getSelectionModel().clearSelection(
                                     listView.getSelectionModel().getSelectedItems().indexOf(cell));
+                        }
                     }));
                 }
             }
         });
-
+        //TODO: listners for last entry of list view is not working
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.getSelectionModel().getSelectedItems()
                 .addListener((ListChangeListener<DownloaderCell>) change -> {
                     if (change.next()) {
 
-                        if (change.wasRemoved())
+                        if (change.wasRemoved()) {
                             change.getRemoved().stream().forEach(cell -> cell.setCheckBoxValue(false));
+                        }
 
-                        if (change.wasAdded())
+                        if (change.wasAdded()) {
                             change.getAddedSubList().stream().forEach(cell -> cell.setCheckBoxValue(true));
-
-                        Predicate<DownloaderCell> predicate = cell -> cell.getData().state == State.ACTIVE;
-
-                        if (change.getList().stream().anyMatch(predicate)) {
-                            prButtonState = ButtonState.PAUSED;
-                            prButton.setId("PauseButton");
-                        } else {
-                            prButtonState = ButtonState.RESUMED;
-                            prButton.setId("ResumeButton");
                         }
                     }
                 });
-
+        listView.getSelectionModel().getSelectedItems()
+                .addListener((ListChangeListener<DownloaderCell>) change -> {
+                    if (change.next()) {
+                        if (listView.getSelectionModel().isEmpty()) {
+                            System.out.println("asdsa");
+                            prButtonState = ButtonState.RESUMED;
+                            prButton.setId("ResumeButton");
+                            deleteButton.setId("DeleteButton");
+                        } else {
+                            deleteButton.setId("DeleteButtonActive");
+                            Predicate<DownloaderCell> predicate = cell -> cell.getData().state == State.ACTIVE;
+                            if (change.getList().stream().anyMatch(predicate)) {
+                                prButtonState = ButtonState.PAUSEDACTIVE;
+                                prButton.setId("PauseButtonActive");
+                            } else {
+                                prButtonState = ButtonState.RESUMEDACTIVE;
+                                prButton.setId("ResumeButtonActive");
+                            }
+                        }
+                    }
+                });
         AnchorPane emptyCell = new AnchorPane();
         emptyCell.setBackground(new Background(new BackgroundFill(
                 Paint.valueOf("#f9f9f9"), CornerRadii.EMPTY, Insets.EMPTY)));

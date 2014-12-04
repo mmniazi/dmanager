@@ -173,7 +173,6 @@ public class DownloaderCell extends ListCell {
     // TODO: -1 is returned when i try to download calendar data from link.
     // TODO: if download is paused and resumed instantly then java.io.IOException: Stream Closed is thrown
     // TODO: if download is paused while connecting.
-    // TODO: if two same downloads are started they start overwriting the same file make some way of handling same downloads
     private void connect() {
         threadService.execute(() -> {
             try {
