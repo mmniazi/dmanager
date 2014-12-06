@@ -5,6 +5,9 @@
  */
 package Components;
 
+import States.Defaults;
+import Util.UriPart;
+import Util.Utilities;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,19 +20,24 @@ import javafx.stage.Popup;
 import javafx.stage.Window;
 
 import java.io.IOException;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.scene.input.MouseEvent;
+import org.apache.commons.validator.UrlValidator;
 
 /**
  * @author muhammad
  */
 public class AddPopUp {
 
+    public Popup popupWindow;
+    Defaults defaults = new Defaults();
+    UrlValidator urlValidator = new UrlValidator();
     @FXML
     public Button startButton;
     @FXML
     public TextField uriField;
-    public Popup popupWindow;
-    @FXML
-    private Label uriLabel;
     @FXML
     private TextField locationField;
     @FXML
@@ -37,13 +45,7 @@ public class AddPopUp {
     @FXML
     private TextField nameField;
     @FXML
-    private Label locationLabel;
-    @FXML
-    private Label segmentsLabel;
-    @FXML
     private TextField segmentField;
-    @FXML
-    private Label nameLabel;
     @FXML
     private AnchorPane pane;
 
@@ -58,15 +60,17 @@ public class AddPopUp {
         popupWindow = new Popup();
         popupWindow.getContent().add(pane);
         popupWindow.show(window);
-    }
 
-    @FXML
-    private void uriFieldController(Event event) {
-        //TODO:develop a proper link checking mechanism
-        if (!uriField.getText().isEmpty()) {
-            startButton.setDisable(false);
-        } else {
-            startButton.setDisable(true);
-        }
+        segmentField.setPromptText(String.valueOf(defaults.getSegments()));
+        locationField.setPromptText(defaults.getDownloadLocation());
+        uriField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (urlValidator.isValid(newValue)) {
+                nameField.setPromptText(Utilities.getFromURI(newValue, UriPart.FILENAME_EXT));
+                startButton.setDisable(false);
+            } else {
+                nameField.setText("");
+                startButton.setDisable(true);
+            }
+        });
     }
 }

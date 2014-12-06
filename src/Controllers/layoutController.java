@@ -59,7 +59,10 @@ public class layoutController implements Initializable {
     private AnchorPane MainWindow;
     @FXML
     private TreeView<String> treeView;
-
+    // work on delete button
+    // work on browse button in add popup
+    // fill add popup text views with default names
+    // Create a file for defaults
     @FXML
     private void addButtonController(ActionEvent actionEvent) {
         AddPopUp popUp = new AddPopUp(MainWindow.getScene().getWindow());
@@ -71,11 +74,11 @@ public class layoutController implements Initializable {
 
             if (downloadsList.stream().noneMatch(predicate)) {
                 StateData data = new StateData(System.getProperty("user.home") + "/", URI.create(uri),
-                        Utilities.getFromURI(uri, Util.URI.FILENAME_EXT), 10);
+                        Utilities.getFromURI(uri, Util.UriPart.FILENAME_EXT), 10);
                 DownloaderCell downloader = new DownloaderCell(data, client, threadService);
                 downloadsList.add(downloader);
                 stateManager.changeState(data, "createState");
-                downloader.set();
+                downloader.initialize();
             } else {
                 //TODO: handle already in list
                 System.out.println("Already in list");
@@ -88,16 +91,28 @@ public class layoutController implements Initializable {
         if (!listView.getSelectionModel().isEmpty()) {
             switch (prButtonState) {
                 case PAUSED:
-                    for (DownloaderCell cell : listView.getSelectionModel().getSelectedItems()) {
-                        cell.stopDownload();
-                    }
+                    listView.getSelectionModel().getSelectedItems().stream().forEach((cell) -> {
+                        if (cell.getData().state.equals(State.ACTIVE)) {
+                            cell.stop();
+                        }
+                    });
                     prButtonState = ButtonState.RESUMED;
                     prButton.setId("ResumeButton");
                     break;
                 case RESUMED:
-                    for (DownloaderCell cell : listView.getSelectionModel().getSelectedItems()) {
-                        cell.startDownload();
-                    }
+                    listView.getSelectionModel().getSelectedItems().stream().forEach((cell) -> {
+                        if (cell.getData().state.equals(State.PAUSED)) {
+                            cell.getData().state = State.ACTIVE;
+                            cell.initialize();
+                        } else if (cell.getData().state.equals(State.SHDLED)) {
+                            cell.getData().state = State.ACTIVE;
+                            cell.initialize();
+                        } else if (cell.getData().state.equals(State.FAILED)) {
+                            cell.resetData();
+                            cell.getData().state = State.ACTIVE;
+                            cell.initialize();
+                        }
+                    });
                     prButtonState = ButtonState.PAUSED;
                     prButton.setId("PauseButton");
                     break;
@@ -127,9 +142,9 @@ public class layoutController implements Initializable {
         initCategoriesTree();
     }
 
-    // TODO: create post about how to create a treeView with only single expanded treeItem
     // TODO: add animations to treeView
-    // TODO: make pr and delete button work and make mechanism for toggling check box when selecting list cells
+    // TODO: make delete button work
+    // TODO: convert all treeview to functional + list listners
     private void initCategoriesTree() {
 
         TreeItem<String> root = new TreeItem<>("Root Node");
@@ -137,25 +152,25 @@ public class layoutController implements Initializable {
 
         TreeItem<String> allDownloads
                 = new TreeItem<>("All Downloads", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/White.png"))));
+                                        getClass().getResourceAsStream("/resources/White.png"))));
         allDownloads.setExpanded(true);
         TreeItem<String> inProgress
                 = new TreeItem<>("Downloading", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/Green.png"))));
+                                        getClass().getResourceAsStream("/resources/Green.png"))));
         TreeItem<String> completed
                 = new TreeItem<>("Completed", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/Blue.png"))));
+                                        getClass().getResourceAsStream("/resources/Blue.png"))));
         TreeItem<String> paused
                 = new TreeItem<>("Paused", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/Orange.png"))));
+                                        getClass().getResourceAsStream("/resources/Orange.png"))));
         TreeItem<String> failed
                 = new TreeItem<>("Failed", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/Red.png"))));
+                                        getClass().getResourceAsStream("/resources/Red.png"))));
 // Adding all tree items to root item
         root.getChildren().addAll(allDownloads, completed, failed, inProgress, paused);
 
 // Defining branches for each tree item
-        for (TreeItem<String> parentItem : root.getChildren()) {
+        root.getChildren().stream().forEach((parentItem) -> {
             TreeItem<String> programs = new TreeItem<>("Programs");
             TreeItem<String> compressed = new TreeItem<>("Compressed");
             TreeItem<String> documents = new TreeItem<>("Documents");
@@ -163,10 +178,8 @@ public class layoutController implements Initializable {
             TreeItem<String> audio = new TreeItem<>("Audio");
             TreeItem<String> images = new TreeItem<>("Images");
             TreeItem<String> others = new TreeItem<>("Others");
-
-// Adding all tree items to parent tree item
             parentItem.getChildren().addAll(programs, compressed, documents, videos, audio, images, others);
-        }
+        });
 
         /*----- Setting the root tree item and hiding root -----*/
         treeView.setRoot(root);
@@ -180,10 +193,7 @@ public class layoutController implements Initializable {
             if (treeView.getSelectionModel().getSelectedIndices().isEmpty()) {
                 event.consume();
             } else if (root.getChildren().contains(selectedItem)) {
-                for (TreeItem<String> treeItem : root.getChildren()) {
-                    treeItem.setExpanded(false);
-                }
-
+                root.getChildren().stream().forEach((treeItem) -> treeItem.setExpanded(false));
                 selectedItem.setExpanded(true);
 
                 if (selectedItem.equals(allDownloads)) {
@@ -221,7 +231,6 @@ public class layoutController implements Initializable {
                 }
             }
         });
-        //TODO: listners for last entry of list view is not working
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.getSelectionModel().getSelectedItems()
                 .addListener((ListChangeListener<DownloaderCell>) change -> {
@@ -229,12 +238,14 @@ public class layoutController implements Initializable {
 
                         if (change.wasRemoved()) {
                             change.getRemoved().stream().forEach(cell -> {
-                                cell.setCheckBoxValue(false);});
+                                cell.setCheckBoxValue(false);
+                            });
                         }
 
                         if (change.wasAdded()) {
                             change.getAddedSubList().stream().forEach(cell -> {
-                                cell.setCheckBoxValue(true);});
+                                cell.setCheckBoxValue(true);
+                            });
                         }
                     }
                 });
@@ -270,7 +281,7 @@ public class layoutController implements Initializable {
         stateManager.readFromFile().stream().forEach((next) -> {
             DownloaderCell downloader = new DownloaderCell(next, client, threadService);
             downloadsList.add(downloader);
-            downloader.set();
+            downloader.initialize();
         });
         listView.setItems(downloadsList);
 

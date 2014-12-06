@@ -9,7 +9,7 @@ package Util;
  *
  * @author muhammad
  */
-public enum URI {
+public enum UriPart {
 
     PARAM(),
     FILENAME(),

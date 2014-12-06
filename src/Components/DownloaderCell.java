@@ -8,7 +8,7 @@ package Components;
 import States.StateData;
 import States.StateManagement;
 import Util.State;
-import Util.URI;
+import Util.UriPart;
 import Util.Utilities;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -70,7 +70,7 @@ public class DownloaderCell extends ListCell {
         this.currentBytes = data.bytesDone.get();
         this.client = client;
         this.threadService = threadService;
-        type = Utilities.findType(Utilities.getFromURI(data.uri.toString(), URI.EXT));
+        type = Utilities.findType(Utilities.getFromURI(data.uri.toString(), UriPart.EXT));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/ListCell.fxml"));
         fxmlLoader.setController(this);
         try {
@@ -82,7 +82,7 @@ public class DownloaderCell extends ListCell {
 
     // TODO: Check for user permissions for file(in fact there is a method to add administrator rights to your application)
     // TODO: Check performance of program.
-    public void set() {
+    public void initialize() {
         preSetGui();
         switch (data.state) {
 
@@ -101,7 +101,7 @@ public class DownloaderCell extends ListCell {
                 defaultButton.setText("Pause");
                 connect();
                 update();
-                defaultButton.setOnAction((ActionEvent event) -> stopDownload());
+                defaultButton.setOnAction((ActionEvent event) -> stop());
                 break;
 
             case CMPLTD:
@@ -146,20 +146,13 @@ public class DownloaderCell extends ListCell {
                 defaultButton.setOnAction((ActionEvent event) -> {
                     data.state = State.ACTIVE;
                     threadService = Executors.newCachedThreadPool();
-                    Platform.runLater(this::set);
+                    Platform.runLater(this::initialize);
                 });
                 break;
         }
     }
 
-    public void startDownload() {
-        data.state = State.ACTIVE;
-        Platform.runLater(this::set);
-        connect();
-        update();
-    }
-
-    public void stopDownload() {
+    public void stop() {
         data.state = State.PAUSED;
         try {
             fileChannel.close();
@@ -168,7 +161,7 @@ public class DownloaderCell extends ListCell {
             Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
         }
         stateManager.changeState(data, "saveState");
-        Platform.runLater(this::set);
+        Platform.runLater(this::initialize);
     }
 
     // TODO: -1 is returned when i try to download calendar data from link.
@@ -272,9 +265,9 @@ public class DownloaderCell extends ListCell {
                 if (list.size() > 5) {
                     list.remove(0);
                 }
-                for (Float increment : list) {
-                    averageSpeed += increment;
-                }
+                averageSpeed = list.stream()
+                        .map((increment) -> increment)
+                        .reduce(averageSpeed, (accumulator, _item) -> accumulator + _item);
                 averageSpeed /= list.size();
                 // Updating Gui //
                 final float finalAverageSpeed = averageSpeed;
@@ -317,10 +310,10 @@ public class DownloaderCell extends ListCell {
             Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
         }
         stateManager.changeState(data, "saveState");
-        Platform.runLater(this::set);
+        Platform.runLater(this::initialize);
     }
 
-    private void resetData() {
+    public void resetData() {
         data = new StateData(data.downloadDirectory, data.uri,
                 data.downloadDirectory, data.segments);
     }

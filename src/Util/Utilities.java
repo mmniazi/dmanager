@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  */
 public class Utilities {
   // TODO: how to get file name from content?
-  public static String getFromURI(String uri, URI required) {
+  public static String getFromURI(String uri, UriPart required) {
     String fileName;
     String param;
     int slashIndex = uri.lastIndexOf("/");
