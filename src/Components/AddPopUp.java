@@ -8,22 +8,19 @@ package Components;
 import States.Defaults;
 import Util.UriPart;
 import Util.Utilities;
-import javafx.event.Event;
+import java.io.File;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Popup;
 import javafx.stage.Window;
-
 import java.io.IOException;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.stage.DirectoryChooser;
 import org.apache.commons.validator.UrlValidator;
 
 /**
@@ -34,8 +31,15 @@ public class AddPopUp {
     public Popup popupWindow;
     Defaults defaults = new Defaults();
     UrlValidator urlValidator = new UrlValidator();
+    String location;
+    String name;
+    int segments;
+    String uri;
+//TODO: use callbacks to finalize this class
     @FXML
     public Button startButton;
+    @FXML
+    public Button cancelButton;
     @FXML
     public TextField uriField;
     @FXML
@@ -72,5 +76,18 @@ public class AddPopUp {
                 startButton.setDisable(true);
             }
         });
+    }
+
+    @FXML
+    private void cancelButtonController(ActionEvent event) {
+        popupWindow.hide();
+    }
+
+    @FXML
+    private void browseButtonController(ActionEvent event) {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Download Directory");
+        chooser.setInitialDirectory(new File("/home/muhammad/"));
+        chooser.showDialog(popupWindow);
     }
 }
