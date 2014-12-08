@@ -12,12 +12,15 @@
 .button {
     -fx-background-radius: 2;
     -fx-background-color: #3498db;
-}
-
-.image {
-    -fx-image: url(../resources/filetypes/default.png)
+    -fx-text-fill: #f9f9f9;
+    // if you are optimizing it for keyboard remove this so selected box can be shown
+    -fx-focus-traversable: false; 
 }
 
 .label {
     -fx-text-fill: #333333;
+}
+
+#Icon {
+    -fx-image: url(../resources/filetypes/default.png)
 }

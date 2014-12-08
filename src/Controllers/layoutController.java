@@ -2,6 +2,7 @@ package Controllers;
 
 import Components.AddPopUp;
 import Components.DownloaderCell;
+import Components.InListPopUp;
 import States.StateData;
 import States.StateManagement;
 import Util.State;
@@ -80,8 +81,7 @@ public class layoutController implements Initializable {
                 stateManager.changeState(data, "createState");
                 downloader.initialize();
             } else {
-                //TODO: handle already in list
-                System.out.println("Already in list");
+                InListPopUp inListPopUp = new InListPopUp(MainWindow.getScene().getWindow());
             }
         });
     }
