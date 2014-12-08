@@ -24,12 +24,6 @@ public class InListPopUp {
     // TODO: working here
     @FXML
     private AnchorPane pane;
-    @FXML
-    private Button replaceButton;
-    @FXML
-    private Button resumeButton;
-    @FXML
-    private Button ignoreButton;
 
     public InListPopUp(Window window) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/InListPopUp.fxml"));
@@ -43,7 +37,7 @@ public class InListPopUp {
         popupWindow.getContent().add(pane);
         popupWindow.show(window);
     }
-
+// TODO: use call backs to do the appropriate action or otherwise you can pass download list
     @FXML
     private void replaceButtonController(ActionEvent event) {
         
