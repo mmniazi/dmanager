@@ -60,10 +60,8 @@ public class layoutController implements Initializable {
     private AnchorPane MainWindow;
     @FXML
     private TreeView<String> treeView;
-    // work on delete button
-    // work on browse button in add popup
-    // fill add popup text views with default names
-    // Create a file for defaults
+
+    // TODO: work on delete button
     @FXML
     private void addButtonController(ActionEvent actionEvent) {
         AddPopUp popUp = new AddPopUp(MainWindow.getScene().getWindow());
