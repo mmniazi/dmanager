@@ -141,8 +141,6 @@ public class layoutController implements Initializable {
     }
 
     // TODO: add animations to treeView
-    // TODO: make delete button work
-    // TODO: convert all treeview to functional + list listners
     private void initCategoriesTree() {
 
         TreeItem<String> root = new TreeItem<>("Root Node");
