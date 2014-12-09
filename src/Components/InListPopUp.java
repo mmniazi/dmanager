@@ -9,7 +9,6 @@ import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Popup;
 import javafx.stage.Window;
@@ -38,9 +37,10 @@ public class InListPopUp {
         popupWindow.show(window);
     }
 // TODO: use call backs to do the appropriate action or otherwise you can pass download list
+
     @FXML
     private void replaceButtonController(ActionEvent event) {
-        
+
     }
 
     @FXML
@@ -50,6 +50,6 @@ public class InListPopUp {
 
     @FXML
     private void ignoreButtonController(ActionEvent event) {
-        
+
     }
 }
