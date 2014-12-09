@@ -45,6 +45,7 @@ import java.util.logging.Logger;
 public class DownloaderCell extends ListCell {
     // TODO: convert all executable to callable and create seprate threadservices and maybe I need a proper ThreadFactory
     // TODO: create a mechanism that will stop download being paused and resumed to quickly && resuming of already completed downloads
+    // TODO: check if downlad is starting 2 times on resuming
     private StateManagement stateManager = StateManagement.getInstance();
     private StateData data;
     private RandomAccessFile file;

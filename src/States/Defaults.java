@@ -11,20 +11,25 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author muhammad
  */
 public class Defaults {
-// TODO: a hell lot remaining here
-    private RandomAccessFile file;
     int segments;
     String downloadLocation;
 
     public Defaults() {
         try {
-            file = new RandomAccessFile(System.getProperty("user.home") + "/defaults", "rw");
-            segments = Integer.valueOf(file.readLine());
-            downloadLocation = file.readLine();
+            RandomAccessFile file = new RandomAccessFile(System.getProperty("user.home") + "/defaults", "rw");
+            if (file.length() > 0) {
+                segments = Integer.valueOf(file.readLine());
+                downloadLocation = file.readLine();
+            } else {
+                segments = 10;
+                downloadLocation = System.getProperty("user.home");
+                file.write(segments);
+                file.writeBytes("\n");
+                file.writeChars(downloadLocation);
+            }
         } catch (IOException ex) {
             Logger.getLogger(Defaults.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -34,9 +39,15 @@ public class Defaults {
         return downloadLocation;
     }
 
+    public void setDownloadLocation(String downloadLocation) {
+        this.downloadLocation = downloadLocation;
+    }
+
     public int getSegments() {
         return segments;
     }
-    
 
+    public void setSegments(int segments) {
+        this.segments = segments;
+    }
 }
