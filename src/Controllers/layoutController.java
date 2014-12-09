@@ -150,20 +150,20 @@ public class layoutController implements Initializable {
 
         TreeItem<String> allDownloads
                 = new TreeItem<>("All Downloads", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/White.png"))));
+                getClass().getResourceAsStream("/resources/White.png"))));
         allDownloads.setExpanded(true);
         TreeItem<String> inProgress
                 = new TreeItem<>("Downloading", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Green.png"))));
+                getClass().getResourceAsStream("/resources/Green.png"))));
         TreeItem<String> completed
                 = new TreeItem<>("Completed", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Blue.png"))));
+                getClass().getResourceAsStream("/resources/Blue.png"))));
         TreeItem<String> paused
                 = new TreeItem<>("Paused", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Orange.png"))));
+                getClass().getResourceAsStream("/resources/Orange.png"))));
         TreeItem<String> failed
                 = new TreeItem<>("Failed", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Red.png"))));
+                getClass().getResourceAsStream("/resources/Red.png"))));
 // Adding all tree items to root item
         root.getChildren().addAll(allDownloads, completed, failed, inProgress, paused);
 
@@ -185,29 +185,30 @@ public class layoutController implements Initializable {
         treeView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         /*----- When one treeItem is selected expand it and collapse all others -----*/
-        treeView.setOnMouseClicked(event -> {
-            TreeItem<String> selectedItem = treeView.getSelectionModel().getSelectedItem();
-
-            if (treeView.getSelectionModel().getSelectedIndices().isEmpty()) {
-                event.consume();
-            } else if (root.getChildren().contains(selectedItem)) {
-                root.getChildren().stream().forEach((treeItem) -> treeItem.setExpanded(false));
-                selectedItem.setExpanded(true);
-
-                if (selectedItem.equals(allDownloads)) {
-                    listView.setItems(downloadsList);
+        treeView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<String>>) change -> {
+            if (change.next()) {
+                TreeItem selectedItem = change.getAddedSubList().get(0);
+                if (!selectedItem.isLeaf()) {
+                    root.getChildren().stream().forEach(treeItem -> {
+                        if (treeItem.equals(selectedItem)) treeItem.setExpanded(true);
+                        else if (treeItem.isExpanded()) treeItem.setExpanded(false);
+                    });
+                    if (selectedItem.equals(allDownloads)) {
+                        listView.setItems(downloadsList);
+                    } else {
+                        listView.setItems(downloadsList.filtered(cell -> cell.getData().state.getValue()
+                                .equals(selectedItem.getValue())));
+                    }
                 } else {
-                    listView.setItems(downloadsList.filtered(cell -> cell.getData().state.getValue()
-                            .equals(selectedItem.getValue())));
-                }
-
-            } else {
-                if (selectedItem.getParent().equals(allDownloads)) {
-                    listView.setItems(downloadsList.filtered(cell -> selectedItem.getValue().equals(cell.getType())));
-                } else {
-                    listView.setItems(downloadsList.filtered(cell -> selectedItem.getParent().getValue()
-                            .equals(cell.getData().state.getValue())
-                            && selectedItem.getValue().equals(cell.getType())));
+                    if (selectedItem.getParent().equals(allDownloads)) {
+                        listView.setItems(downloadsList
+                                .filtered(cell -> selectedItem.getValue().equals(cell.getType())));
+                    } else {
+                        listView.setItems(downloadsList
+                                .filtered(cell -> selectedItem.getParent().getValue()
+                                        .equals(cell.getData().state.getValue())
+                                        && selectedItem.getValue().equals(cell.getType())));
+                    }
                 }
             }
         });
@@ -235,15 +236,11 @@ public class layoutController implements Initializable {
                     if (change.next()) {
 
                         if (change.wasRemoved()) {
-                            change.getRemoved().stream().forEach(cell -> {
-                                cell.setCheckBoxValue(false);
-                            });
+                            change.getRemoved().stream().forEach(cell -> cell.setCheckBoxValue(false));
                         }
 
                         if (change.wasAdded()) {
-                            change.getAddedSubList().stream().forEach(cell -> {
-                                cell.setCheckBoxValue(true);
-                            });
+                            change.getAddedSubList().stream().forEach(cell -> cell.setCheckBoxValue(true));
                         }
                     }
                 });
