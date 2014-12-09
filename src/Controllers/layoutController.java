@@ -2,6 +2,7 @@ package Controllers;
 
 import Components.AddPopUp;
 import Components.DownloaderCell;
+import Components.InListPopUp;
 import States.StateData;
 import States.StateManagement;
 import Util.State;
@@ -59,13 +60,10 @@ public class layoutController implements Initializable {
     private AnchorPane MainWindow;
     @FXML
     private TreeView<String> treeView;
-
-    // INSHA-ALLAH
     // work on delete button
+    // work on browse button in add popup
     // fill add popup text views with default names
     // Create a file for defaults
-    // TODO: study call backs so I can move start button controller to popup class
-    // TODO: get the location, name and segments from add popup
     @FXML
     private void addButtonController(ActionEvent actionEvent) {
         AddPopUp popUp = new AddPopUp(MainWindow.getScene().getWindow());
@@ -83,8 +81,7 @@ public class layoutController implements Initializable {
                 stateManager.changeState(data, "createState");
                 downloader.initialize();
             } else {
-                //TODO: handle already in list
-                System.out.println("Already in list");
+                InListPopUp inListPopUp = new InListPopUp(MainWindow.getScene().getWindow());
             }
         });
     }

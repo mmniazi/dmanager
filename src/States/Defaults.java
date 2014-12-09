@@ -26,9 +26,9 @@ public class Defaults {
             } else {
                 segments = 10;
                 downloadLocation = System.getProperty("user.home");
-                file.write(segments);
+                file.writeBytes("10");
                 file.writeBytes("\n");
-                file.writeChars(downloadLocation);
+                file.writeBytes(downloadLocation);
             }
         } catch (IOException ex) {
             Logger.getLogger(Defaults.class.getName()).log(Level.SEVERE, null, ex);
@@ -51,3 +51,4 @@ public class Defaults {
         this.segments = segments;
     }
 }
+

@@ -89,7 +89,8 @@ public class AddPopUp {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Download Directory");
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        locationField.setText(chooser.showDialog(popupWindow).toString());
+        File selectedDirectory = chooser.showDialog(popupWindow);
+        if (!(selectedDirectory == null)) locationField.setText(selectedDirectory.toString());
     }
 
     public String getUri() {
