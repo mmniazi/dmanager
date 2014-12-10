@@ -326,10 +326,6 @@ public class DownloaderCell extends ListCell {
         return checkBox.isSelected();
     }
 
-    public void setCheckBoxValue(boolean bool) {
-        checkBox.setSelected(bool);
-    }
-
     public CheckBox getCheckBox() {
         return checkBox;
     }
@@ -341,6 +337,14 @@ public class DownloaderCell extends ListCell {
 
     public StateData getData() {
         return data;
+    }
+
+    public void setCheckBoxValue(boolean bool) {
+        checkBox.setSelected(bool);
+    }
+    
+    public void setData(StateData data){
+        this.data = data;
     }
 
     private class Segment implements Runnable {

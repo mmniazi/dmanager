@@ -5,6 +5,8 @@
  */
 package Components;
 
+import Controllers.layoutController;
+import States.StateData;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,12 +21,15 @@ import java.io.IOException;
  */
 public class InListPopUp {
 
-    public Popup popupWindow;
-    // TODO: working here
+    private final Popup popupWindow;
+    private final layoutController controller;
+    private final DownloaderCell cell;
+    private final StateData data;
+    
     @FXML
     private AnchorPane pane;
 
-    public InListPopUp(Window window) {
+    public InListPopUp(Window window, layoutController controller, DownloaderCell cell, StateData data) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/InListPopUp.fxml"));
         fxmlLoader.setController(this);
         try {
@@ -35,21 +40,26 @@ public class InListPopUp {
         popupWindow = new Popup();
         popupWindow.getContent().add(pane);
         popupWindow.show(window);
-    }
-// TODO: use call backs to do the appropriate action or otherwise you can pass download list
-
-    @FXML
-    private void replaceButtonController(ActionEvent event) {
-
+        this.controller = controller;
+        this.cell = cell;
+        this.data = data;
     }
 
     @FXML
-    private void resumeButtonController(ActionEvent event) {
-
+    private void replaceButtonController(ActionEvent event) throws InterruptedException {
+        cell.stop();
+        Thread.sleep(1000);
+        cell.setData(data);
+        cell.initialize();
     }
 
     @FXML
-    private void ignoreButtonController(ActionEvent event) {
+    private void viewButtonController(ActionEvent event) {
+        controller.showDownload(cell);
+    }
 
+    @FXML
+    private void cancelButtonController(ActionEvent event) {
+        popupWindow.hide();
     }
 }

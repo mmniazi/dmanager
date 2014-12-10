@@ -6,7 +6,6 @@ import Components.InListPopUp;
 import States.StateData;
 import States.StateManagement;
 import Util.State;
-import Util.Utilities;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -28,8 +27,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
-import java.net.URI;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -64,24 +63,7 @@ public class layoutController implements Initializable {
     // TODO: work on delete button
     @FXML
     private void addButtonController(ActionEvent actionEvent) {
-        AddPopUp popUp = new AddPopUp(MainWindow.getScene().getWindow());
-        popUp.startButton.addEventHandler(ActionEvent.ACTION, (ActionEvent event) -> {
-            String uri = popUp.uriField.getText();
-            popUp.popupWindow.hide();
-
-            Predicate<DownloaderCell> predicate = cell -> cell.getData().uri.toString().equalsIgnoreCase(uri);
-
-            if (downloadsList.stream().noneMatch(predicate)) {
-                StateData data = new StateData(System.getProperty("user.home") + "/", URI.create(uri),
-                        Utilities.getFromURI(uri, Util.UriPart.FILENAME_EXT), 10);
-                DownloaderCell downloader = new DownloaderCell(data, client, threadService);
-                downloadsList.add(downloader);
-                stateManager.changeState(data, "createState");
-                downloader.initialize();
-            } else {
-                InListPopUp inListPopUp = new InListPopUp(MainWindow.getScene().getWindow());
-            }
-        });
+        AddPopUp popUp = new AddPopUp(MainWindow.getScene().getWindow(), this);
     }
 
     @FXML
@@ -148,20 +130,20 @@ public class layoutController implements Initializable {
 
         TreeItem<String> allDownloads
                 = new TreeItem<>("All Downloads", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/White.png"))));
+                                        getClass().getResourceAsStream("/resources/White.png"))));
         allDownloads.setExpanded(true);
         TreeItem<String> inProgress
                 = new TreeItem<>("Downloading", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/Green.png"))));
+                                        getClass().getResourceAsStream("/resources/Green.png"))));
         TreeItem<String> completed
                 = new TreeItem<>("Completed", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/Blue.png"))));
+                                        getClass().getResourceAsStream("/resources/Blue.png"))));
         TreeItem<String> paused
                 = new TreeItem<>("Paused", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/Orange.png"))));
+                                        getClass().getResourceAsStream("/resources/Orange.png"))));
         TreeItem<String> failed
                 = new TreeItem<>("Failed", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/Red.png"))));
+                                        getClass().getResourceAsStream("/resources/Red.png"))));
 // Adding all tree items to root item
         root.getChildren().addAll(allDownloads, completed, failed, inProgress, paused);
 
@@ -188,8 +170,11 @@ public class layoutController implements Initializable {
                 TreeItem selectedItem = change.getAddedSubList().get(0);
                 if (!selectedItem.isLeaf()) {
                     root.getChildren().stream().forEach(treeItem -> {
-                        if (treeItem.equals(selectedItem)) treeItem.setExpanded(true);
-                        else if (treeItem.isExpanded()) treeItem.setExpanded(false);
+                        if (treeItem.equals(selectedItem)) {
+                            treeItem.setExpanded(true);
+                        } else if (treeItem.isExpanded()) {
+                            treeItem.setExpanded(false);
+                        }
                     });
                     if (selectedItem.equals(allDownloads)) {
                         listView.setItems(downloadsList);
@@ -278,6 +263,63 @@ public class layoutController implements Initializable {
         });
         listView.setItems(downloadsList);
 
+    }
+    /* 
+     possible options:
+     1- cancel/ignore
+     2- replace it --
+     3- view it
+     4- download seprately
+     */
+
+    // TODO: Handle file name duplicates
+    // short circuit add download 
+    // working on add download
+    public void addDownload(StateData data) {
+
+        Predicate<DownloaderCell> predicate = cell -> cell.getData().uri.equals(data.uri);
+        Optional<DownloaderCell> cell = downloadsList.stream().filter(predicate).findFirst();
+
+        if (cell.isPresent()) {
+            InListPopUp inListPopUp = new InListPopUp(MainWindow.getScene().getWindow(), this, cell.get(), data);
+        } else {
+            DownloaderCell downloader = new DownloaderCell(data, client, threadService);
+            downloadsList.add(downloader);
+            stateManager.changeState(data, "createState");
+            downloader.initialize();
+        }
+    }
+
+    public void deleteDownload(DownloaderCell cell) {
+
+    }
+
+    public void replaceDownload(DownloaderCell cell) {
+
+    }
+
+    public void pauseDownload(DownloaderCell cell) {
+
+    }
+
+    public void resumeDownload(DownloaderCell cell) {
+
+    }
+
+    public void showDownload(DownloaderCell cell) {
+
+    }
+
+    public ExecutorService getThreadService() {
+        return threadService;
+    }
+
+    public CloseableHttpClient getClient() {
+        return client;
+    }
+
+    public ObservableList<DownloaderCell> getDownloaderList() {
+        return downloadsList;
     }
 }
 

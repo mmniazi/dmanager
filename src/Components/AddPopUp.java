@@ -5,7 +5,9 @@
  */
 package Components;
 
+import Controllers.layoutController;
 import States.Defaults;
+import States.StateData;
 import Util.UriPart;
 import Util.Utilities;
 import javafx.beans.value.ObservableValue;
@@ -23,22 +25,22 @@ import org.apache.commons.validator.routines.UrlValidator;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 
 /**
  * @author muhammad
  */
 public class AddPopUp {
 
-    public Popup popupWindow;
-    //TODO: use callbacks to finalize this class
-    @FXML
-    public Button startButton;
-    @FXML
-    public Button cancelButton;
-    @FXML
-    public TextField uriField;
+    private final Popup popupWindow;
     Defaults defaults = new Defaults();
     UrlValidator urlValidator = new UrlValidator();
+    layoutController controller;
+
+    @FXML
+    private Button startButton;
+    @FXML
+    private TextField uriField;
     @FXML
     private TextField locationField;
     @FXML
@@ -49,9 +51,11 @@ public class AddPopUp {
     private TextField segmentField;
     @FXML
     private AnchorPane pane;
-
+    // TODO: start while asking for start
     // TODO: automatically paste from clip board when popup starts
-    public AddPopUp(Window window) {
+    // change image based on file type
+    public AddPopUp(Window window, layoutController controller) {
+
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/AddPopUp.fxml"));
         fxmlLoader.setController(this);
         try {
@@ -59,9 +63,11 @@ public class AddPopUp {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         popupWindow = new Popup();
         popupWindow.getContent().add(pane);
         popupWindow.show(window);
+        this.controller = controller;
 
         segmentField.setText(String.valueOf(defaults.getSegments()));
         locationField.setText(defaults.getDownloadLocation());
@@ -80,6 +86,15 @@ public class AddPopUp {
     }
 
     @FXML
+    private void startButtonController(ActionEvent event) {
+        StateData data = new StateData(locationField.getText(),
+                URI.create(uriField.getText()),
+                Utilities.getFromURI(uriField.getText(), Util.UriPart.FILENAME_EXT), 10);
+        controller.addDownload(data);
+        popupWindow.hide();
+    }
+
+    @FXML
     private void cancelButtonController(ActionEvent event) {
         popupWindow.hide();
     }
@@ -90,22 +105,8 @@ public class AddPopUp {
         chooser.setTitle("Download Directory");
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
         File selectedDirectory = chooser.showDialog(popupWindow);
-        if (!(selectedDirectory == null)) locationField.setText(selectedDirectory.toString());
-    }
-
-    public String getUri() {
-        return uriField.getText();
-    }
-
-    public String getName() {
-        return nameField.getText();
-    }
-
-    public String getLocation() {
-        return locationField.getText();
-    }
-
-    public String getSegments() {
-        return segmentField.getText();
+        if (!(selectedDirectory == null)) {
+            locationField.setText(selectedDirectory.toString());
+        }
     }
 }

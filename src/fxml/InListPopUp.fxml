@@ -1,51 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="AnchorPane" fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity"
-            minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="400.0" styleClass="pane"
-            stylesheets="@../css/PopUp.css" xmlns="http://javafx.com/javafx/8">
+
+<AnchorPane id="AnchorPane" fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="400.0" styleClass="pane" stylesheets="@../css/PopUp.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <HBox layoutX="33.0" layoutY="93.0" spacing="20.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="30.0"
-              AnchorPane.rightAnchor="30.0">
+        <HBox layoutX="33.0" layoutY="93.0" spacing="20.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0">
             <children>
-                <Button fx:id="replace" layoutX="33.0" layoutY="93.0" maxHeight="-Infinity" maxWidth="-Infinity"
-                        minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false"
-                        onAction="#replaceButtonController" prefHeight="27.0" prefWidth="100.0" text="Replace"
-                        textFill="#f9f9f9"/>
-                <Button fx:id="resume" layoutX="153.0" layoutY="93.0" maxHeight="-Infinity" maxWidth="-Infinity"
-                        minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false"
-                        onAction="#resumeButtonController" prefHeight="27.0" prefWidth="100.0" text="Resume"
-                        textFill="#f9f9f9"/>
-                <Button fx:id="ignore" layoutX="273.0" layoutY="93.0" maxHeight="-Infinity" maxWidth="-Infinity"
-                        minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false"
-                        onAction="#ignoreButtonController" prefHeight="27.0" prefWidth="100.0" text="Ignore"
-                        textFill="#f9f9f9"/>
+                <Button layoutX="33.0" layoutY="93.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#replaceButtonController" prefHeight="27.0" prefWidth="100.0" text="Replace" textFill="#f9f9f9" />
+                <Button layoutX="153.0" layoutY="93.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#viewButtonController" prefHeight="27.0" prefWidth="100.0" text="View" textFill="#f9f9f9" />
+                <Button layoutX="273.0" layoutY="93.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#cancelButtonController" prefHeight="27.0" prefWidth="100.0" text="Cancel" textFill="#f9f9f9" />
             </children>
         </HBox>
-        <VBox alignment="CENTER" layoutY="25.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-              AnchorPane.topAnchor="15.0">
+        <VBox alignment="CENTER" layoutY="25.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="15.0">
             <children>
                 <Label alignment="CENTER" text="Already in List" textAlignment="CENTER">
                     <font>
-                        <Font size="22.0"/>
+                        <Font size="22.0" />
                     </font>
                     <padding>
-                        <Insets bottom="10.0"/>
+                        <Insets bottom="10.0" />
                     </padding>
                 </Label>
-                <Label alignment="CENTER" layoutX="-38.0" layoutY="60.0"
-                       text="The Download you added is already in list" AnchorPane.leftAnchor="0.0"
-                       AnchorPane.rightAnchor="0.0"/>
-                <Label alignment="CENTER" layoutX="101.0" layoutY="75.0" text="Choose the appropriate action"
-                       AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"/>
+                <Label alignment="CENTER" layoutX="-38.0" layoutY="60.0" text="The Download you added is already in list" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                <Label alignment="CENTER" layoutX="101.0" layoutY="75.0" text="Choose the appropriate action" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
             </children>
         </VBox>
     </children>
     <effect>
-        <DropShadow offsetY="2.0"/>
+        <DropShadow offsetY="2.0" />
     </effect>
 </AnchorPane>
