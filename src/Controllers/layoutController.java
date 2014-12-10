@@ -61,6 +61,7 @@ public class layoutController implements Initializable {
     private TreeView<String> treeView;
 
     // TODO: work on delete button
+    // TODO: listview scroll bar is not styled
     @FXML
     private void addButtonController(ActionEvent actionEvent) {
         AddPopUp popUp = new AddPopUp(MainWindow.getScene().getWindow(), this);
@@ -264,17 +265,8 @@ public class layoutController implements Initializable {
         listView.setItems(downloadsList);
 
     }
-    /* 
-     possible options:
-     1- cancel/ignore
-     2- replace it --
-     3- view it
-     4- download seprately
-     */
 
     // TODO: Handle file name duplicates
-    // short circuit add download 
-    // working on add download
     public void addDownload(StateData data) {
 
         Predicate<DownloaderCell> predicate = cell -> cell.getData().uri.equals(data.uri);
@@ -290,36 +282,9 @@ public class layoutController implements Initializable {
         }
     }
 
-    public void deleteDownload(DownloaderCell cell) {
-
-    }
-
-    public void replaceDownload(DownloaderCell cell) {
-
-    }
-
-    public void pauseDownload(DownloaderCell cell) {
-
-    }
-
-    public void resumeDownload(DownloaderCell cell) {
-
-    }
-
     public void showDownload(DownloaderCell cell) {
-
-    }
-
-    public ExecutorService getThreadService() {
-        return threadService;
-    }
-
-    public CloseableHttpClient getClient() {
-        return client;
-    }
-
-    public ObservableList<DownloaderCell> getDownloaderList() {
-        return downloadsList;
+        listView.getSelectionModel().clearAndSelect(listView.getItems().indexOf(cell));
+        listView.scrollTo(cell);
     }
 }
 

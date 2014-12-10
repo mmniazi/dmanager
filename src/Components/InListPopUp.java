@@ -48,14 +48,15 @@ public class InListPopUp {
     @FXML
     private void replaceButtonController(ActionEvent event) throws InterruptedException {
         cell.stop();
-        Thread.sleep(1000);
         cell.setData(data);
         cell.initialize();
+        popupWindow.hide();
     }
 
     @FXML
     private void viewButtonController(ActionEvent event) {
         controller.showDownload(cell);
+        popupWindow.hide();
     }
 
     @FXML
