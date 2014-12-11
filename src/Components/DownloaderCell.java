@@ -8,6 +8,7 @@ package Components;
 import States.StateData;
 import States.StateManagement;
 import Util.State;
+import Util.TotalSpeedCalc;
 import Util.UriPart;
 import Util.Utilities;
 import javafx.application.Platform;
@@ -46,6 +47,7 @@ public class DownloaderCell extends ListCell {
     // TODO: convert all executable to callable and create seprate threadservices and maybe I need a proper ThreadFactory
     // TODO: create a mechanism that will stop download being paused and resumed to quickly && resuming of already completed downloads
     private StateManagement stateManager = StateManagement.getInstance();
+    private TotalSpeedCalc speedCalc = TotalSpeedCalc.getInstance();
     private StateData data;
     private RandomAccessFile file;
     private CloseableHttpClient client;
@@ -269,6 +271,7 @@ public class DownloaderCell extends ListCell {
                         .map((increment) -> increment)
                         .reduce(averageSpeed, (accumulator, _item) -> accumulator + _item);
                 averageSpeed /= list.size();
+                speedCalc.updateTotalSpeed(speed);
                 // Updating Gui //
                 final float finalAverageSpeed = averageSpeed;
                 Platform.runLater(() -> {

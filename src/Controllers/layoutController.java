@@ -6,6 +6,7 @@ import Components.InListPopUp;
 import States.StateData;
 import States.StateManagement;
 import Util.State;
+import Util.TotalSpeedCalc;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -45,6 +46,7 @@ public class layoutController implements Initializable {
     CloseableHttpClient client;
     StateManagement stateManager;
     ButtonState prButtonState = ButtonState.RESUMED;
+
     @FXML
     private Button exitButton;
     @FXML
@@ -59,6 +61,10 @@ public class layoutController implements Initializable {
     private AnchorPane MainWindow;
     @FXML
     private TreeView<String> treeView;
+    @FXML
+    private Label totalDownloadsLabel;
+    @FXML
+    private Label totalSpeedLabel;
 
     // TODO: work on delete button
     @FXML
@@ -108,6 +114,7 @@ public class layoutController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         threadService = Executors.newCachedThreadPool();
         stateManager = StateManagement.getInstance();
+        downloadsList = FXCollections.observableArrayList();
         connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(1000);
         connectionManager.setDefaultMaxPerRoute(100);
@@ -118,6 +125,7 @@ public class layoutController implements Initializable {
                 setConnectionManager(connectionManager).
                 setDefaultRequestConfig(requestConfig).
                 build();
+        initLabels();
         initDownloadsList();
         initCategoriesTree();
     }
@@ -197,9 +205,8 @@ public class layoutController implements Initializable {
         });
     }
 
+    // TODO: inshaAllah going to build that hover effect I first designed
     private void initDownloadsList() {
-        downloadsList = FXCollections.observableArrayList();
-        // TODO: inshaAllah going to build that hover effect I first designed
         downloadsList.addListener((ListChangeListener<DownloaderCell>) change -> {
             if (change.next()) {
                 if (change.wasAdded()) {
@@ -210,6 +217,7 @@ public class layoutController implements Initializable {
                             listView.getSelectionModel().clearSelection(listView.getItems().indexOf(cell));
                         }
                     }));
+
                 }
             }
         });
@@ -265,6 +273,27 @@ public class layoutController implements Initializable {
 
     }
 
+    private void initLabels() {
+        TotalSpeedCalc speedCalc = TotalSpeedCalc.getInstance();
+        speedCalc.setController(this);
+        downloadsList.addListener((ListChangeListener.Change<? extends DownloaderCell> change) -> {
+            if (change.next()) {
+                if (change.wasAdded()) {
+                    int value = Integer.valueOf(totalDownloadsLabel.getText());
+                    value += change.getAddedSize();
+                    totalDownloadsLabel.setText(String.valueOf(value));
+                    speedCalc.updateSize(value);
+                } else if (change.wasRemoved()) {
+                    int value = Integer.valueOf(totalDownloadsLabel.getText());
+                    value -= change.getRemovedSize();
+                    totalDownloadsLabel.setText(String.valueOf(value));
+                    speedCalc.updateSize(value);
+                }
+            }
+        });
+        
+    }
+
     // TODO: Handle file name duplicates
     public void addDownload(StateData data) {
 
@@ -284,6 +313,10 @@ public class layoutController implements Initializable {
     public void showDownload(DownloaderCell cell) {
         listView.getSelectionModel().clearAndSelect(listView.getItems().indexOf(cell));
         listView.scrollTo(cell);
+    }
+    
+    public void updateTotalSpeed(int speed){
+        totalSpeedLabel.setText(String.valueOf(speed));
     }
 }
 
