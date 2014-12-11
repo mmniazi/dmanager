@@ -25,7 +25,7 @@ public class InListPopUp {
     private final layoutController controller;
     private final DownloaderCell cell;
     private final StateData data;
-    
+
     @FXML
     private AnchorPane pane;
 
@@ -46,7 +46,7 @@ public class InListPopUp {
     }
 
     @FXML
-    private void replaceButtonController(ActionEvent event) throws InterruptedException {
+    private void replaceButtonController(ActionEvent event) {
         cell.stop();
         cell.setData(data);
         cell.initialize();

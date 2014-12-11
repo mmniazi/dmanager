@@ -61,7 +61,6 @@ public class layoutController implements Initializable {
     private TreeView<String> treeView;
 
     // TODO: work on delete button
-    // TODO: listview scroll bar is not styled
     @FXML
     private void addButtonController(ActionEvent actionEvent) {
         AddPopUp popUp = new AddPopUp(MainWindow.getScene().getWindow(), this);
