@@ -15,15 +15,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TotalSpeedCalc {
 
     private static final TotalSpeedCalc instance = new TotalSpeedCalc();
-    private AtomicInteger speed;
-    private AtomicInteger counter;
-    private AtomicInteger size;
+    private final AtomicInteger speed;
+    private final AtomicInteger counter;
+    private final AtomicInteger totalNo;
     private layoutController controller;
 
     private TotalSpeedCalc() {
         this.counter = new AtomicInteger(0);
         this.speed = new AtomicInteger(0);
-        this.size = new AtomicInteger(0);
+        this.totalNo = new AtomicInteger(0);
     }
 
     public void setController(layoutController controller) {
@@ -34,14 +34,16 @@ public class TotalSpeedCalc {
         return instance;
     }
 
-    public void updateSize(int size) {
-        this.size.set(size);
+    public void updateTotalNo(int size) {
+        this.totalNo.set(size);
     }
 
     public void updateTotalSpeed(float newSpeed) {
         this.speed.addAndGet((int) newSpeed);
-        if (this.counter.incrementAndGet() == size.get()) {
+        if (this.counter.incrementAndGet() == totalNo.get()) {
             controller.updateTotalSpeed(speed.get());
+            this.counter.set(0);
+            this.speed.set(0);
         }
 
     }

@@ -34,6 +34,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Predicate;
+import javafx.application.Platform;
 
 /**
  * @author muhammad
@@ -265,14 +266,14 @@ public class layoutController implements Initializable {
         });
 
         stateManager.readFromFile().stream().forEach((next) -> {
-            DownloaderCell downloader = new DownloaderCell(next, client, threadService);
+            DownloaderCell downloader = new DownloaderCell(next, this);
             downloadsList.add(downloader);
             downloader.initialize();
         });
         listView.setItems(downloadsList);
 
     }
-
+// TODO: updateTotalNo should be based on active no of downloads
     private void initLabels() {
         TotalSpeedCalc speedCalc = TotalSpeedCalc.getInstance();
         speedCalc.setController(this);
@@ -282,16 +283,16 @@ public class layoutController implements Initializable {
                     int value = Integer.valueOf(totalDownloadsLabel.getText());
                     value += change.getAddedSize();
                     totalDownloadsLabel.setText(String.valueOf(value));
-                    speedCalc.updateSize(value);
+                    speedCalc.updateTotalNo(value);
                 } else if (change.wasRemoved()) {
                     int value = Integer.valueOf(totalDownloadsLabel.getText());
                     value -= change.getRemovedSize();
                     totalDownloadsLabel.setText(String.valueOf(value));
-                    speedCalc.updateSize(value);
+                    speedCalc.updateTotalNo(value);
                 }
             }
         });
-        
+
     }
 
     // TODO: Handle file name duplicates
@@ -303,7 +304,7 @@ public class layoutController implements Initializable {
         if (cell.isPresent()) {
             InListPopUp inListPopUp = new InListPopUp(MainWindow.getScene().getWindow(), this, cell.get(), data);
         } else {
-            DownloaderCell downloader = new DownloaderCell(data, client, threadService);
+            DownloaderCell downloader = new DownloaderCell(data, this);
             downloadsList.add(downloader);
             stateManager.changeState(data, "createState");
             downloader.initialize();
@@ -314,13 +315,23 @@ public class layoutController implements Initializable {
         listView.getSelectionModel().clearAndSelect(listView.getItems().indexOf(cell));
         listView.scrollTo(cell);
     }
-    
-    public void updateTotalSpeed(int speed){
-        totalSpeedLabel.setText(String.valueOf(speed));
+
+    public void updateTotalSpeed(int speed) {
+        Platform.runLater(()
+                -> totalSpeedLabel.setText(Util.Utilities.speedConverter(speed))
+        );
+    }
+
+    public CloseableHttpClient getClient() {
+        return client;
+    }
+
+    public ExecutorService getThreadService() {
+        return threadService;
     }
 }
 
-/* ----- Download Links -----*/
+/*----- Download Links -----*/
 // http://softlayer-sng.dl.sourceforge.net/project/elementaryos/unstable/elementaryos-unstable-amd64.20140810.iso
 // https://www.google.com/calendar/ical/tk5scqbfe80ffdcfj86uppbhvk%40group.calendar.google.com/private-0dfe7855fa8b78365041b2b27261446e/basic.ics
 // http://downloads.sourceforge.net/project/sevenzip/7-Zip/9.22/7z922.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fsevenzip%2F&ts=1415925898&use_mirror=kaz

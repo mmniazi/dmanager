@@ -5,6 +5,7 @@
  */
 package Components;
 
+import Controllers.layoutController;
 import States.StateData;
 import States.StateManagement;
 import Util.State;
@@ -44,8 +45,10 @@ import java.util.logging.Logger;
  * @author muhammad
  */
 public class DownloaderCell extends ListCell {
+
     // TODO: convert all executable to callable and create seprate threadservices and maybe I need a proper ThreadFactory
     // TODO: create a mechanism that will stop download being paused and resumed to quickly && resuming of already completed downloads
+
     private StateManagement stateManager = StateManagement.getInstance();
     private TotalSpeedCalc speedCalc = TotalSpeedCalc.getInstance();
     private StateData data;
@@ -67,11 +70,11 @@ public class DownloaderCell extends ListCell {
     @FXML
     private Label fileLabel, sDoneLabel, sTotalLabel, timeLabel, speedLabel, statusLabel;
 
-    public DownloaderCell(StateData data, CloseableHttpClient client, ExecutorService threadService) {
+    public DownloaderCell(StateData data, layoutController controller) {
         this.data = data;
         this.currentBytes = data.bytesDone.get();
-        this.client = client;
-        this.threadService = threadService;
+        this.client = controller.getClient();
+        this.threadService = controller.getThreadService();
         type = Utilities.findType(Utilities.getFromURI(data.uri.toString(), UriPart.EXT));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/ListCell.fxml"));
         fxmlLoader.setController(this);
@@ -271,7 +274,7 @@ public class DownloaderCell extends ListCell {
                         .map((increment) -> increment)
                         .reduce(averageSpeed, (accumulator, _item) -> accumulator + _item);
                 averageSpeed /= list.size();
-                speedCalc.updateTotalSpeed(speed);
+                speedCalc.updateTotalSpeed(averageSpeed);
                 // Updating Gui //
                 final float finalAverageSpeed = averageSpeed;
                 Platform.runLater(() -> {
@@ -333,7 +336,6 @@ public class DownloaderCell extends ListCell {
         return checkBox;
     }
 
-
     public String getType() {
         return type;
     }
@@ -345,8 +347,8 @@ public class DownloaderCell extends ListCell {
     public void setCheckBoxValue(boolean bool) {
         checkBox.setSelected(bool);
     }
-    
-    public void setData(StateData data){
+
+    public void setData(StateData data) {
         this.data = data;
     }
 
