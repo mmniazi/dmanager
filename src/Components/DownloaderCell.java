@@ -255,7 +255,6 @@ public class DownloaderCell extends ListCell {
     // TODO: speed calculation giving a bit low results. It can be jugated by increasing the sleep time.
     private void update() {
         threadService.execute(() -> {
-            System.out.println("udpate called");
             controller.updateActiveDownloads(true);
             List<Float> list = new ArrayList<>();
             while (data.state == State.ACTIVE) {
