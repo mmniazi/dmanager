@@ -91,14 +91,14 @@ public class layoutController implements Initializable {
                     listView.getSelectionModel().getSelectedItems().stream().forEach((cell) -> {
                         if (cell.getData().state.equals(State.PAUSED)) {
                             cell.getData().state = State.ACTIVE;
-                            cell.initialize();
+                            cell.initializeCell();
                         } else if (cell.getData().state.equals(State.SHDLED)) {
                             cell.getData().state = State.ACTIVE;
-                            cell.initialize();
+                            cell.initializeCell();
                         } else if (cell.getData().state.equals(State.FAILED)) {
                             cell.resetData();
                             cell.getData().state = State.ACTIVE;
-                            cell.initialize();
+                            cell.initializeCell();
                         }
                     });
                     prButtonState = ButtonState.PAUSED;
@@ -268,9 +268,9 @@ public class layoutController implements Initializable {
         });
 
         stateManager.readFromFile().stream().forEach((next) -> {
-            DownloaderCell downloader = new DownloaderCell(next, this);
-            downloadsList.add(downloader);
-            downloader.initialize();
+            DownloaderCell cell = new DownloaderCell(next, this);
+            downloadsList.add(cell);
+            cell.initializeCell();
         });
         listView.setItems(downloadsList);
 
@@ -280,15 +280,15 @@ public class layoutController implements Initializable {
     public void addDownload(StateData data) {
 
         Predicate<DownloaderCell> predicate = cell -> cell.getData().uri.equals(data.uri);
-        Optional<DownloaderCell> cell = downloadsList.stream().filter(predicate).findFirst();
+        Optional<DownloaderCell> optionalCell = downloadsList.stream().filter(predicate).findFirst();
 
-        if (cell.isPresent()) {
-            InListPopUp inListPopUp = new InListPopUp(MainWindow.getScene().getWindow(), this, cell.get(), data);
+        if (optionalCell.isPresent()) {
+            InListPopUp inListPopUp = new InListPopUp(MainWindow.getScene().getWindow(), this, optionalCell.get(), data);
         } else {
-            DownloaderCell downloader = new DownloaderCell(data, this);
-            downloadsList.add(downloader);
+            DownloaderCell cell = new DownloaderCell(data, this);
+            downloadsList.add(cell);
             stateManager.changeState(data, "createState");
-            downloader.initialize();
+            cell.initializeCell();
         }
     }
 
@@ -305,13 +305,13 @@ public class layoutController implements Initializable {
 
     public void updateActiveDownloads(boolean increment) {
         if (increment) {
-            int activeDownload = Integer.valueOf(totalDownloadsLabel.getText()) + 1;
-            totalDownloadsLabel.setText(String.valueOf(activeDownload));
-            speedCalc.updateActiveDownloads(activeDownload);
+            int activeDownloads = Integer.valueOf(totalDownloadsLabel.getText()) + 1;
+            Platform.runLater(() -> totalDownloadsLabel.setText(String.valueOf(activeDownloads)));
+            speedCalc.updateActiveDownloads(activeDownloads);
         } else {
-            int activeDownload = Integer.valueOf(totalDownloadsLabel.getText()) - 1;
-            totalDownloadsLabel.setText(String.valueOf(activeDownload));
-            speedCalc.updateActiveDownloads(activeDownload);
+            int activeDownloads = Integer.valueOf(totalDownloadsLabel.getText()) - 1;
+            Platform.runLater(() -> totalDownloadsLabel.setText(String.valueOf(activeDownloads)));
+            speedCalc.updateActiveDownloads(activeDownloads);
         }
     }
 

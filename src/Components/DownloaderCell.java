@@ -87,7 +87,7 @@ public class DownloaderCell extends ListCell {
 
     // TODO: Check for user permissions for file(in fact there is a method to add administrator rights to your application)
     // TODO: Check performance of program.
-    public void initialize() {
+    public void initializeCell() {
         preSetGui();
         switch (data.state) {
 
@@ -151,7 +151,7 @@ public class DownloaderCell extends ListCell {
                 defaultButton.setOnAction((ActionEvent event) -> {
                     data.state = State.ACTIVE;
                     threadService = Executors.newCachedThreadPool();
-                    Platform.runLater(this::initialize);
+                    Platform.runLater(this::initializeCell);
                 });
                 break;
         }
@@ -167,7 +167,7 @@ public class DownloaderCell extends ListCell {
         }
         stateManager.changeState(data, "saveState");
         controller.updateActiveDownloads(false);
-        Platform.runLater(this::initialize);
+        Platform.runLater(this::initializeCell);
     }
 
     // TODO: -1 is returned when i try to download calendar data from link.
@@ -216,7 +216,7 @@ public class DownloaderCell extends ListCell {
                     data.initialState.set(i, i * sizeOfEachSegment);
                     data.finalState.set(i, (i + 1) * sizeOfEachSegment);
                 }
-                
+
                 data.initialState.set(
                         data.segments - 1, data.segments * sizeOfEachSegment);
                 data.finalState.set(data.segments - 1, data.sizeOfFile);
@@ -319,7 +319,7 @@ public class DownloaderCell extends ListCell {
         }
         stateManager.changeState(data, "saveState");
         controller.updateActiveDownloads(false);
-        Platform.runLater(this::initialize);
+        Platform.runLater(this::initializeCell);
     }
 
     public void resetData() {

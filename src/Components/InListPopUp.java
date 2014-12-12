@@ -49,7 +49,7 @@ public class InListPopUp {
     private void replaceButtonController(ActionEvent event) {
         cell.stop();
         cell.setData(data);
-        cell.initialize();
+        cell.initializeCell();
         popupWindow.hide();
     }
 
