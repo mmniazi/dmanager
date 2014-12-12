@@ -17,13 +17,13 @@ public class TotalSpeedCalc {
     private static final TotalSpeedCalc instance = new TotalSpeedCalc();
     private final AtomicInteger speed;
     private final AtomicInteger counter;
-    private final AtomicInteger totalNo;
+    private final AtomicInteger activeDownloads;
     private layoutController controller;
 
     private TotalSpeedCalc() {
         this.counter = new AtomicInteger(0);
         this.speed = new AtomicInteger(0);
-        this.totalNo = new AtomicInteger(0);
+        this.activeDownloads = new AtomicInteger(0);
     }
 
     public void setController(layoutController controller) {
@@ -34,13 +34,13 @@ public class TotalSpeedCalc {
         return instance;
     }
 
-    public void updateTotalNo(int size) {
-        this.totalNo.set(size);
+    public void updateActiveDownloads(int activeDownloads) {
+        this.activeDownloads.set(activeDownloads);
     }
 
     public void updateTotalSpeed(float newSpeed) {
         this.speed.addAndGet((int) newSpeed);
-        if (this.counter.incrementAndGet() == totalNo.get()) {
+        if (this.counter.incrementAndGet() == activeDownloads.get()) {
             controller.updateTotalSpeed(speed.get());
             this.counter.set(0);
             this.speed.set(0);

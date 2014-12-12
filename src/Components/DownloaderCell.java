@@ -46,11 +46,10 @@ import java.util.logging.Logger;
  */
 public class DownloaderCell extends ListCell {
 
-    // TODO: convert all executable to callable and create seprate threadservices and maybe I need a proper ThreadFactory
     // TODO: create a mechanism that will stop download being paused and resumed to quickly && resuming of already completed downloads
-
     private StateManagement stateManager = StateManagement.getInstance();
     private TotalSpeedCalc speedCalc = TotalSpeedCalc.getInstance();
+    private layoutController controller;
     private StateData data;
     private RandomAccessFile file;
     private CloseableHttpClient client;
@@ -73,6 +72,7 @@ public class DownloaderCell extends ListCell {
     public DownloaderCell(StateData data, layoutController controller) {
         this.data = data;
         this.currentBytes = data.bytesDone.get();
+        this.controller = controller;
         this.client = controller.getClient();
         this.threadService = controller.getThreadService();
         type = Utilities.findType(Utilities.getFromURI(data.uri.toString(), UriPart.EXT));
@@ -118,14 +118,14 @@ public class DownloaderCell extends ListCell {
                     if (event.isControlDown()) {
                         try {
                             Desktop.getDesktop().open(new File(data.downloadDirectory));
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        } catch (IOException ex) {
+                            Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     } else {
                         try {
                             Desktop.getDesktop().open(new File(data.downloadDirectory + data.fileName));
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        } catch (IOException ex) {
+                            Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                 });
@@ -166,6 +166,7 @@ public class DownloaderCell extends ListCell {
             Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
         }
         stateManager.changeState(data, "saveState");
+        controller.updateActiveDownloads(false);
         Platform.runLater(this::initialize);
     }
 
@@ -215,7 +216,7 @@ public class DownloaderCell extends ListCell {
                     data.initialState.set(i, i * sizeOfEachSegment);
                     data.finalState.set(i, (i + 1) * sizeOfEachSegment);
                 }
-                // assign remaining bytes to last segment.
+                
                 data.initialState.set(
                         data.segments - 1, data.segments * sizeOfEachSegment);
                 data.finalState.set(data.segments - 1, data.sizeOfFile);
@@ -254,6 +255,8 @@ public class DownloaderCell extends ListCell {
     // TODO: speed calculation giving a bit low results. It can be jugated by increasing the sleep time.
     private void update() {
         threadService.execute(() -> {
+            System.out.println("udpate called");
+            controller.updateActiveDownloads(true);
             List<Float> list = new ArrayList<>();
             while (data.state == State.ACTIVE) {
                 try {
@@ -316,6 +319,7 @@ public class DownloaderCell extends ListCell {
             Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
         }
         stateManager.changeState(data, "saveState");
+        controller.updateActiveDownloads(false);
         Platform.runLater(this::initialize);
     }
 

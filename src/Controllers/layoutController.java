@@ -47,6 +47,7 @@ public class layoutController implements Initializable {
     CloseableHttpClient client;
     StateManagement stateManager;
     ButtonState prButtonState = ButtonState.RESUMED;
+    TotalSpeedCalc speedCalc;
 
     @FXML
     private Button exitButton;
@@ -119,6 +120,8 @@ public class layoutController implements Initializable {
         connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(1000);
         connectionManager.setDefaultMaxPerRoute(100);
+        speedCalc = TotalSpeedCalc.getInstance();
+        speedCalc.setController(this);
         RequestConfig requestConfig = RequestConfig.custom()
                 .setCookieSpec(CookieSpecs.BEST_MATCH)
                 .build();
@@ -126,7 +129,6 @@ public class layoutController implements Initializable {
                 setConnectionManager(connectionManager).
                 setDefaultRequestConfig(requestConfig).
                 build();
-        initLabels();
         initDownloadsList();
         initCategoriesTree();
     }
@@ -273,27 +275,6 @@ public class layoutController implements Initializable {
         listView.setItems(downloadsList);
 
     }
-// TODO: updateTotalNo should be based on active no of downloads
-    private void initLabels() {
-        TotalSpeedCalc speedCalc = TotalSpeedCalc.getInstance();
-        speedCalc.setController(this);
-        downloadsList.addListener((ListChangeListener.Change<? extends DownloaderCell> change) -> {
-            if (change.next()) {
-                if (change.wasAdded()) {
-                    int value = Integer.valueOf(totalDownloadsLabel.getText());
-                    value += change.getAddedSize();
-                    totalDownloadsLabel.setText(String.valueOf(value));
-                    speedCalc.updateTotalNo(value);
-                } else if (change.wasRemoved()) {
-                    int value = Integer.valueOf(totalDownloadsLabel.getText());
-                    value -= change.getRemovedSize();
-                    totalDownloadsLabel.setText(String.valueOf(value));
-                    speedCalc.updateTotalNo(value);
-                }
-            }
-        });
-
-    }
 
     // TODO: Handle file name duplicates
     public void addDownload(StateData data) {
@@ -320,6 +301,18 @@ public class layoutController implements Initializable {
         Platform.runLater(()
                 -> totalSpeedLabel.setText(Util.Utilities.speedConverter(speed))
         );
+    }
+
+    public void updateActiveDownloads(boolean increment) {
+        if (increment) {
+            int activeDownload = Integer.valueOf(totalDownloadsLabel.getText()) + 1;
+            totalDownloadsLabel.setText(String.valueOf(activeDownload));
+            speedCalc.updateActiveDownloads(activeDownload);
+        } else {
+            int activeDownload = Integer.valueOf(totalDownloadsLabel.getText()) - 1;
+            totalDownloadsLabel.setText(String.valueOf(activeDownload));
+            speedCalc.updateActiveDownloads(activeDownload);
+        }
     }
 
     public CloseableHttpClient getClient() {
