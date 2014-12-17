@@ -86,16 +86,11 @@
 }
 
 #MinimizeButton {
-    -fx-graphic: url(../resources/MinimizeButton.png);
-}
-
-#SettingButton {
-    -fx-graphic: url(../resources/SettingButton.png);
+    -fx-graphic: url(../resources/Black.png);
 }
 
 #ExitButton {
-    -fx-text-fill: #f9f9f9;
-    -fx-background-color: #e74c3c;
+    -fx-graphic: url(../resources/Red.png);
 }
 
 #BackgroundPane {
@@ -149,11 +144,4 @@
     -fx-background-insets: 2, 0, 0;
     -fx-background-radius: 0;
 
-}
-
-/* Tool Bar */
-
-.tool-bar .button {
-    -fx-background-color: black;
-    -fx-text-fill: white;
 }

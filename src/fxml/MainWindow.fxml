@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
 <?import javafx.scene.effect.*?>
 <?import java.lang.*?>
 <?import javafx.scene.text.*?>
@@ -12,19 +13,28 @@
    <children>
       <AnchorPane id="BackgroundPane" fx:id="MainWindow" layoutX="9.0" layoutY="9.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
           <children>
-              <ListView id="ListView" fx:id="listView" focusTraversable="false" layoutX="194.0" layoutY="119.0" prefHeight="470.0" prefWidth="819.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="100.0" />
-            <HBox layoutX="789.0" layoutY="5.0" spacing="10.0" AnchorPane.rightAnchor="5.0">
+            <Separator AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="57.0" />
+            <Pane layoutX="345.0" layoutY="73.0" AnchorPane.topAnchor="50.0">
                <children>
-                    <TextField id="SearchBar" layoutX="768.0" layoutY="4.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="22.0" prefWidth="150.0" promptText="Search" AnchorPane.rightAnchor="85.0" AnchorPane.topAnchor="5.0" />
-                    <Button id="ExitButton" fx:id="exitButton" layoutX="945.0" layoutY="4.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="80.0" text="Exit" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="5.0">
+                  <Button alignment="CENTER" layoutX="295.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="62.0" styleClass="listButtons" text="Speed" AnchorPane.leftAnchor="640.0" AnchorPane.topAnchor="73.0" />
+                  <Button alignment="CENTER" layoutX="393.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="54.0" styleClass="listButtons" text="Time" AnchorPane.leftAnchor="738.0" AnchorPane.topAnchor="73.0" />
+                  <Button alignment="CENTER" layoutX="480.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="50.0" styleClass="listButtons" text="Size" AnchorPane.leftAnchor="825.0" AnchorPane.topAnchor="73.0" />
+                  <Button alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="60.0" styleClass="listButtons" text="Name" textAlignment="CENTER" AnchorPane.leftAnchor="345.0" AnchorPane.topAnchor="73.0" />
+                  <Button alignment="CENTER" layoutX="180.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="80.0" styleClass="listButtons" text="Progress" AnchorPane.leftAnchor="525.0" AnchorPane.topAnchor="73.0" />
+               </children>
+            </Pane>
+              <ListView id="ListView" fx:id="listView" focusTraversable="false" layoutX="194.0" layoutY="119.0" prefHeight="470.0" prefWidth="819.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="70.0" />
+            <HBox layoutX="789.0" layoutY="5.0" spacing="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
+               <children>
+                    <TextField id="SearchBar" layoutX="768.0" layoutY="4.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="150.0" promptText="Search" AnchorPane.rightAnchor="85.0" AnchorPane.topAnchor="5.0" />
+                    <Button id="ExitButton" fx:id="exitButton" layoutX="945.0" layoutY="4.0" mnemonicParsing="false" prefHeight="25.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="5.0">
                         <font>
                             <Font name="Droid Sans Mono" size="16.0" />
                         </font>
                     </Button>
-                    <Button id="MinimizeButton" layoutX="997.0" layoutY="6.0" maxWidth="85.0" mnemonicParsing="false" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="5.0" />
+                    <Button id="MinimizeButton" layoutX="997.0" layoutY="6.0" mnemonicParsing="false" prefHeight="25.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="5.0" />
                </children>
             </HBox>
-              <Button id="SettingButton" layoutX="984.0" layoutY="28.0" mnemonicParsing="false" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="35.0" />
               <VBox id="SidePane" layoutX="5.0" layoutY="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                   <children>
                       <HBox layoutX="14.0" layoutY="48.0" spacing="20.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="20.0">
@@ -42,42 +52,42 @@
                               <Insets top="30.0" />
                           </VBox.margin>
                       </TreeView>
-                  <HBox>
-                     <children>
-                            <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="sidePaneLabel" text="     Downloads: " textAlignment="CENTER">
-                                <VBox.margin>
-                                    <Insets left="5.0" />
-                                </VBox.margin>
-                            </Label>
-                        <Label fx:id="totalDownloadsLabel" styleClass="sidePaneLabel" text="0" />
-                     </children>
-                  </HBox>
-                  <HBox>
-                     <children>
-                            <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="sidePaneLabel" text="     Speed: " textAlignment="CENTER">
-                                <VBox.margin>
-                                    <Insets left="5.0" />
-                                </VBox.margin>
-                            </Label>
-                        <Label fx:id="totalSpeedLabel" styleClass="sidePaneLabel" text="0" />
-                     </children>
-                  </HBox>
                   </children>
                   <padding>
                       <Insets bottom="5.0" top="35.0" />
                   </padding>
               </VBox>
-              <ComboBox layoutX="907.0" layoutY="574.0" prefHeight="25.0" prefWidth="116.0" promptText="Unlimited" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" />
-              <Label layoutX="817.0" layoutY="577.0" text="Speed Limit:" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="125.0" />
-            <ToolBar layoutX="200.0" layoutY="73.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="0.0">
-               <items>
-                    <Button alignment="CENTER" layoutX="269.0" layoutY="73.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="300.0" styleClass="listButtons" text="Name" textAlignment="CENTER" AnchorPane.leftAnchor="345.0" AnchorPane.topAnchor="73.0" />
-                    <Button alignment="CENTER" layoutX="555.0" layoutY="72.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="135.0" styleClass="listButtons" text="Progress" AnchorPane.leftAnchor="525.0" AnchorPane.topAnchor="73.0" />
-                    <Button alignment="CENTER" layoutX="647.0" layoutY="73.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="85.0" styleClass="listButtons" text="Speed" AnchorPane.leftAnchor="640.0" AnchorPane.topAnchor="73.0" />
-                    <Button alignment="CENTER" layoutX="742.0" layoutY="74.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="90.0" styleClass="listButtons" text="Time" AnchorPane.leftAnchor="738.0" AnchorPane.topAnchor="73.0" />
-                    <Button alignment="CENTER" layoutX="831.0" layoutY="67.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="70.0" styleClass="listButtons" text="Size" AnchorPane.leftAnchor="825.0" AnchorPane.topAnchor="73.0" />
-               </items>
-            </ToolBar>
+            <HBox layoutX="817.0" layoutY="570.0" spacing="10.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="10.0">
+               <children>
+                    <Label layoutX="817.0" layoutY="577.0" prefHeight="25.0" text="Speed Limit:" AnchorPane.bottomAnchor="10.0" />
+                    <ComboBox layoutX="907.0" layoutY="574.0" prefHeight="25.0" prefWidth="116.0" promptText="Unlimited" AnchorPane.bottomAnchor="5.0" />
+               </children>
+            </HBox>
+            <Separator AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="50.0" />
+            <HBox alignment="CENTER" layoutX="223.0" layoutY="575.0" prefHeight="25.0" spacing="10.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="210.0">
+               <children>
+                  <HBox alignment="CENTER" layoutX="223.0" layoutY="575.0">
+                     <children>
+                            <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="     Downloads: " textAlignment="CENTER">
+                                <VBox.margin>
+                                    <Insets left="5.0" />
+                                </VBox.margin>
+                            </Label>
+                        <Label fx:id="totalDownloadsLabel" text="45" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" layoutX="471.0" layoutY="575.0">
+                     <children>
+                            <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="     Speed: " textAlignment="CENTER">
+                                <VBox.margin>
+                                    <Insets left="5.0" />
+                                </VBox.margin>
+                            </Label>
+                        <Label fx:id="totalSpeedLabel" text="553.00 Kb/s" />
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
           </children>
          <effect>
             <DropShadow offsetY="1.0" />
