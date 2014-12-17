@@ -33,6 +33,8 @@ import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -331,6 +333,14 @@ public class DownloaderCell extends ListCell {
         controller.updateActiveDownloads(false);
         Platform.runLater(this::initializeCell);
         stateTransition(false);
+    }
+
+    public void delete() {
+        try {
+            Files.delete(Paths.get(data.downloadDirectory, data.fileName));
+        } catch (IOException ex) {
+            Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void stateTransition(boolean transition) {

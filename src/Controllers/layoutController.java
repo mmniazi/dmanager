@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javafx.application.Platform;
 
@@ -50,15 +51,9 @@ public class layoutController implements Initializable {
     TotalSpeedCalc speedCalc;
 
     @FXML
-    private Button exitButton;
-    @FXML
-    private Button deleteButton;
-    @FXML
     private Button prButton;
     @FXML
     private ListView<DownloaderCell> listView;
-    @FXML
-    private Button addButton;
     @FXML
     private AnchorPane MainWindow;
     @FXML
@@ -107,6 +102,12 @@ public class layoutController implements Initializable {
 
     @FXML
     private void deleteButtonController(ActionEvent actionEvent) {
+        listView.getSelectionModel().getSelectedItems().forEach((DownloaderCell cell) -> {
+            listView.getSelectionModel().clearSelection(listView.getItems().indexOf(cell));
+            listView.getItems().remove(cell);
+            cell.stop();
+            cell.delete();
+        });
     }
 
     @Override

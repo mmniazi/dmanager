@@ -41,7 +41,7 @@
                           <children>
                               <Button id="AddButton" fx:id="addButton" layoutX="36.0" layoutY="48.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#addButtonController" prefHeight="35.0" prefWidth="35.0" />
                               <Button id="ResumeButton" fx:id="prButton" layoutX="108.0" layoutY="48.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#prButtonController" prefHeight="35.0" prefWidth="35.0" />
-                              <Button id="DeleteButton" fx:id="deleteButton" layoutX="181.0" layoutY="48.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" />
+                              <Button id="DeleteButton" fx:id="deleteButton" layoutX="181.0" layoutY="48.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#deleteButtonController" prefHeight="35.0" prefWidth="35.0" />
                           </children>
                           <padding>
                               <Insets left="30.0" />
