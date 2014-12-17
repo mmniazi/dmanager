@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.effect.*?>
 <?import java.lang.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
@@ -7,66 +8,80 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="BackgroundPane" fx:id="MainWindow" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@../css/MainWindow.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.layoutController">
-    <children>
-        <ListView id="ListView" fx:id="listView" focusTraversable="false" layoutX="194.0" layoutY="119.0" prefHeight="470.0" prefWidth="819.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="100.0" />
-        <TextField id="SearchBar" layoutX="768.0" layoutY="4.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="22.0" prefWidth="150.0" promptText="Search" AnchorPane.rightAnchor="85.0" AnchorPane.topAnchor="5.0" />
-        <Button id="ExitButton" fx:id="exitButton" layoutX="945.0" layoutY="4.0" mnemonicParsing="false" text="Exit" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="5.0">
-            <font>
-                <Font name="Droid Sans Mono" size="16.0" />
-            </font>
-        </Button>
-        <Button id="SettingButton" layoutX="984.0" layoutY="28.0" mnemonicParsing="false" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="35.0" />
-        <Button id="MinimizeButton" layoutX="997.0" layoutY="6.0" maxWidth="85.0" mnemonicParsing="false" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="5.0" />
-        <VBox id="SidePane" layoutX="5.0" layoutY="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <children>
-                <HBox layoutX="14.0" layoutY="48.0" spacing="20.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="20.0">
-                    <children>
-                        <Button id="AddButton" fx:id="addButton" layoutX="36.0" layoutY="48.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#addButtonController" prefHeight="35.0" prefWidth="35.0" />
-                        <Button id="ResumeButton" fx:id="prButton" layoutX="108.0" layoutY="48.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#prButtonController" prefHeight="35.0" prefWidth="35.0" />
-                        <Button id="DeleteButton" fx:id="deleteButton" layoutX="181.0" layoutY="48.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" />
-                    </children>
-                    <padding>
-                        <Insets left="30.0" />
-                    </padding>
-                </HBox>
-                <TreeView fx:id="treeView" focusTraversable="false" layoutY="100.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="200.0" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="100.0">
-                    <VBox.margin>
-                        <Insets top="30.0" />
-                    </VBox.margin>
-                </TreeView>
-            <HBox>
+<AnchorPane id="ShadowPane" stylesheets="@../css/MainWindow.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.layoutController">
+   <children>
+      <AnchorPane id="BackgroundPane" fx:id="MainWindow" layoutX="9.0" layoutY="9.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
+          <children>
+              <ListView id="ListView" fx:id="listView" focusTraversable="false" layoutX="194.0" layoutY="119.0" prefHeight="470.0" prefWidth="819.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="100.0" />
+            <HBox layoutX="789.0" layoutY="5.0" spacing="10.0" AnchorPane.rightAnchor="5.0">
                <children>
-                      <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="sidePaneLabel" text="     Downloads: " textAlignment="CENTER">
-                          <VBox.margin>
-                              <Insets left="5.0" />
-                          </VBox.margin>
-                      </Label>
-                  <Label fx:id="totalDownloadsLabel" styleClass="sidePaneLabel" text="0" />
+                    <TextField id="SearchBar" layoutX="768.0" layoutY="4.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="22.0" prefWidth="150.0" promptText="Search" AnchorPane.rightAnchor="85.0" AnchorPane.topAnchor="5.0" />
+                    <Button id="ExitButton" fx:id="exitButton" layoutX="945.0" layoutY="4.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="80.0" text="Exit" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="5.0">
+                        <font>
+                            <Font name="Droid Sans Mono" size="16.0" />
+                        </font>
+                    </Button>
+                    <Button id="MinimizeButton" layoutX="997.0" layoutY="6.0" maxWidth="85.0" mnemonicParsing="false" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="5.0" />
                </children>
             </HBox>
-            <HBox>
-               <children>
-                      <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="sidePaneLabel" text="     Speed: " textAlignment="CENTER">
+              <Button id="SettingButton" layoutX="984.0" layoutY="28.0" mnemonicParsing="false" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="35.0" />
+              <VBox id="SidePane" layoutX="5.0" layoutY="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <children>
+                      <HBox layoutX="14.0" layoutY="48.0" spacing="20.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="20.0">
+                          <children>
+                              <Button id="AddButton" fx:id="addButton" layoutX="36.0" layoutY="48.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#addButtonController" prefHeight="35.0" prefWidth="35.0" />
+                              <Button id="ResumeButton" fx:id="prButton" layoutX="108.0" layoutY="48.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#prButtonController" prefHeight="35.0" prefWidth="35.0" />
+                              <Button id="DeleteButton" fx:id="deleteButton" layoutX="181.0" layoutY="48.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="35.0" prefWidth="35.0" />
+                          </children>
+                          <padding>
+                              <Insets left="30.0" />
+                          </padding>
+                      </HBox>
+                      <TreeView fx:id="treeView" focusTraversable="false" layoutY="100.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="200.0" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="100.0">
                           <VBox.margin>
-                              <Insets left="5.0" />
+                              <Insets top="30.0" />
                           </VBox.margin>
-                      </Label>
-                  <Label fx:id="totalSpeedLabel" styleClass="sidePaneLabel" text="0" />
+                      </TreeView>
+                  <HBox>
+                     <children>
+                            <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="sidePaneLabel" text="     Downloads: " textAlignment="CENTER">
+                                <VBox.margin>
+                                    <Insets left="5.0" />
+                                </VBox.margin>
+                            </Label>
+                        <Label fx:id="totalDownloadsLabel" styleClass="sidePaneLabel" text="0" />
+                     </children>
+                  </HBox>
+                  <HBox>
+                     <children>
+                            <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="sidePaneLabel" text="     Speed: " textAlignment="CENTER">
+                                <VBox.margin>
+                                    <Insets left="5.0" />
+                                </VBox.margin>
+                            </Label>
+                        <Label fx:id="totalSpeedLabel" styleClass="sidePaneLabel" text="0" />
+                     </children>
+                  </HBox>
+                  </children>
+                  <padding>
+                      <Insets bottom="5.0" top="35.0" />
+                  </padding>
+              </VBox>
+              <ComboBox layoutX="907.0" layoutY="574.0" prefHeight="25.0" prefWidth="116.0" promptText="Unlimited" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" />
+              <Label layoutX="817.0" layoutY="577.0" text="Speed Limit:" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="125.0" />
+            <HBox layoutX="200.0" layoutY="73.0" spacing="10.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="0.0">
+               <children>
+                    <Button alignment="CENTER" layoutX="269.0" layoutY="73.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="300.0" styleClass="listButtons" text="Name" textAlignment="CENTER" AnchorPane.leftAnchor="345.0" AnchorPane.topAnchor="73.0" />
+                    <Button alignment="CENTER" layoutX="555.0" layoutY="72.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="135.0" styleClass="listButtons" text="Progress" AnchorPane.leftAnchor="525.0" AnchorPane.topAnchor="73.0" />
+                    <Button alignment="CENTER" layoutX="647.0" layoutY="73.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="85.0" styleClass="listButtons" text="Speed" AnchorPane.leftAnchor="640.0" AnchorPane.topAnchor="73.0" />
+                    <Button alignment="CENTER" layoutX="742.0" layoutY="74.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="90.0" styleClass="listButtons" text="Time" AnchorPane.leftAnchor="738.0" AnchorPane.topAnchor="73.0" />
+                    <Button alignment="CENTER" layoutX="831.0" layoutY="67.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="70.0" styleClass="listButtons" text="Size" AnchorPane.leftAnchor="825.0" AnchorPane.topAnchor="73.0" />
                </children>
             </HBox>
-            </children>
-            <padding>
-                <Insets bottom="5.0" top="35.0" />
-            </padding>
-        </VBox>
-        <ComboBox layoutX="907.0" layoutY="574.0" prefHeight="25.0" prefWidth="116.0" promptText="Unlimited" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" />
-        <Label layoutX="817.0" layoutY="577.0" text="Speed Limit:" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="125.0" />
-        <Separator layoutX="281.0" layoutY="91.0" AnchorPane.leftAnchor="225.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="80.0" />
-        <Button alignment="CENTER" layoutX="269.0" layoutY="73.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="60.0" styleClass="listButtons" text="Name" textAlignment="CENTER" AnchorPane.leftAnchor="345.0" AnchorPane.topAnchor="73.0" />
-        <Button alignment="CENTER" layoutX="555.0" layoutY="72.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="80.0" styleClass="listButtons" text="Progress" AnchorPane.leftAnchor="525.0" AnchorPane.topAnchor="73.0" />
-        <Button alignment="CENTER" layoutX="647.0" layoutY="73.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="62.0" styleClass="listButtons" text="Speed" AnchorPane.leftAnchor="640.0" AnchorPane.topAnchor="73.0" />
-        <Button alignment="CENTER" layoutX="742.0" layoutY="74.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="54.0" styleClass="listButtons" text="Time" AnchorPane.leftAnchor="738.0" AnchorPane.topAnchor="73.0" />
-        <Button alignment="CENTER" layoutX="831.0" layoutY="67.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="50.0" styleClass="listButtons" text="Size" AnchorPane.leftAnchor="825.0" AnchorPane.topAnchor="73.0" />
-    </children>
+          </children>
+         <effect>
+            <DropShadow offsetY="1.0" />
+         </effect>
+      </AnchorPane>
+   </children>
 </AnchorPane>

@@ -157,84 +157,6 @@ public class DownloaderCell extends ListCell {
         }
     }
 
-    public void stop() {
-        data.state = State.PAUSED;
-        try {
-            fileChannel.close();
-            file.close();
-        } catch (IOException ex) {
-            Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        stateManager.changeState(data, "saveState");
-        controller.updateActiveDownloads(false);
-        Platform.runLater(this::initializeCell);
-    }
-
-    // TODO: -1 is returned when i try to download calendar data from link.
-    // TODO: if download is paused and resumed instantly then java.io.IOException: Stream Closed is thrown
-    // TODO: if download is paused while connecting.
-    private void connect() {
-        threadService.execute(() -> {
-            try {
-                file = new RandomAccessFile(new File(data.downloadDirectory + data.fileName), "rwd");
-                fileChannel = file.getChannel();
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(
-                        DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            /*----- Getting Size of File -----*/
-            try {
-                HttpGet sizeGet = new HttpGet(data.uri);
-                CloseableHttpResponse sizeResponse = client.execute(sizeGet);
-                data.sizeOfFile = sizeResponse.getEntity().getContentLength();
-                file.setLength(data.sizeOfFile);
-            } catch (IOException ex) {
-                Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            /*----- Getting Segments for download -----*/
-            try {
-                HttpGet segmentsGet = new HttpGet(data.uri);
-                segmentsGet.setHeader("Range", "bytes=" + 0 + "-" + 1);
-                CloseableHttpResponse segmentsResponse = client.execute(segmentsGet);
-                if (segmentsResponse.getStatusLine().getStatusCode() != 206) {
-                    data.segments = 1;
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            if (data.segments == 1) {
-                data.initialState = new AtomicLongArray(1);
-                data.finalState = new AtomicLongArray(1);
-                data.initialState.set(0, 0);
-                data.finalState.set(0, data.sizeOfFile);
-            } else {
-                long sizeOfEachSegment = data.sizeOfFile / data.segments;
-                data.initialState = new AtomicLongArray(data.segments);
-                data.finalState = new AtomicLongArray(data.segments);
-                for (int i = 0; i < data.segments - 1; i++) {
-                    data.initialState.set(i, i * sizeOfEachSegment);
-                    data.finalState.set(i, (i + 1) * sizeOfEachSegment);
-                }
-
-                data.initialState.set(
-                        data.segments - 1, data.segments * sizeOfEachSegment);
-                data.finalState.set(data.segments - 1, data.sizeOfFile);
-            }
-            data.state = State.ACTIVE;
-            stateManager.changeState(data, "saveState");
-            start();
-        });
-    }
-
-    private void start() {
-        for (int i = 0; i < data.segments; i++) {
-            if (data.initialState.get(i) < data.finalState.get(i)) {
-                threadService.execute(new Segment(i));
-            }
-        }
-    }
-
     private void preSetGui() {
         if (data.sizeOfFile == 0) {
             fileLabel.setText(data.fileName);
@@ -250,6 +172,70 @@ public class DownloaderCell extends ListCell {
             progressBar.setProgress(data.bytesDone.floatValue() / data.sizeOfFile);
             statusLabel.setText("(" + ((data.bytesDone.get() * 100) / data.sizeOfFile) + "%" + ")");
         }
+    }
+
+    // TODO: -1 is returned when i try to download calendar data from link.
+    // TODO: if download is paused and resumed instantly then java.io.IOException: Stream Closed is thrown
+    // TODO: if download is paused while connecting.
+    // TODO: safe guard against controller prbutton
+    private void connect() {
+        threadService.execute(() -> {
+            try {
+                file = new RandomAccessFile(new File(data.downloadDirectory + data.fileName), "rwd");
+                fileChannel = file.getChannel();
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(
+                        DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (!data.initialized) {
+                stateTransition(true);
+                /*----- Getting Size of File -----*/
+                try {
+                    HttpGet sizeGet = new HttpGet(data.uri);
+                    CloseableHttpResponse sizeResponse = client.execute(sizeGet);
+                    data.sizeOfFile = sizeResponse.getEntity().getContentLength();
+                    file.setLength(data.sizeOfFile);
+                } catch (IOException ex) {
+                    Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                /*----- Getting Segments for download -----*/
+                try {
+                    HttpGet segmentsGet = new HttpGet(data.uri);
+                    segmentsGet.setHeader("Range", "bytes=" + 0 + "-" + 1);
+                    CloseableHttpResponse segmentsResponse = client.execute(segmentsGet);
+                    if (segmentsResponse.getStatusLine().getStatusCode() != 206) {
+                        data.segments = 1;
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                if (data.segments == 1) {
+                    data.initialState = new AtomicLongArray(1);
+                    data.finalState = new AtomicLongArray(1);
+                    data.initialState.set(0, 0);
+                    data.finalState.set(0, data.sizeOfFile);
+                } else {
+                    long sizeOfEachSegment = data.sizeOfFile / data.segments;
+                    data.initialState = new AtomicLongArray(data.segments);
+                    data.finalState = new AtomicLongArray(data.segments);
+                    for (int i = 0; i < data.segments - 1; i++) {
+                        data.initialState.set(i, i * sizeOfEachSegment);
+                        data.finalState.set(i, (i + 1) * sizeOfEachSegment);
+                    }
+                    
+                    data.initialState.set(
+                            data.segments - 1, data.segments * sizeOfEachSegment);
+                    data.finalState.set(data.segments - 1, data.sizeOfFile);
+                }
+                data.state = State.ACTIVE;
+                data.initialized = true;
+                stateManager.changeState(data, "saveState");
+                stateTransition(false);
+            }
+            
+            start();
+        });
     }
 
     // TODO: speed calculation giving a bit low results. It can be jugated by increasing the sleep time.
@@ -309,7 +295,31 @@ public class DownloaderCell extends ListCell {
         });
     }
 
+    private void start() {
+        for (int i = 0; i < data.segments; i++) {
+            if (data.initialState.get(i) < data.finalState.get(i)) {
+                threadService.execute(new Segment(i));
+            }
+        }
+    }
+
+    public void stop() {
+        stateTransition(true);
+        data.state = State.PAUSED;
+        try {
+            fileChannel.close();
+            file.close();
+        } catch (IOException ex) {
+            Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        stateManager.changeState(data, "saveState");
+        controller.updateActiveDownloads(false);
+        Platform.runLater(this::initializeCell);
+        stateTransition(false);
+    }
+
     private void complete() {
+        stateTransition(true);
         data.state = State.CMPLTD;
         try {
             fileChannel.close();
@@ -320,6 +330,11 @@ public class DownloaderCell extends ListCell {
         stateManager.changeState(data, "saveState");
         controller.updateActiveDownloads(false);
         Platform.runLater(this::initializeCell);
+        stateTransition(false);
+    }
+
+    private void stateTransition(boolean transition) {
+        Platform.runLater(() -> defaultButton.setDisable(transition));
     }
 
     public void resetData() {
@@ -363,7 +378,7 @@ public class DownloaderCell extends ListCell {
         public Segment(int name) {
             this.name = name;
         }
-
+        // TODO: jab tak ya threads end nhi hota naya download resume na hona do. Some counter may be used
         @Override
         public void run() {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);

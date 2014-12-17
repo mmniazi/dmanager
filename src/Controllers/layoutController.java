@@ -92,9 +92,6 @@ public class layoutController implements Initializable {
                         if (cell.getData().state.equals(State.PAUSED)) {
                             cell.getData().state = State.ACTIVE;
                             cell.initializeCell();
-                        } else if (cell.getData().state.equals(State.SHDLED)) {
-                            cell.getData().state = State.ACTIVE;
-                            cell.initializeCell();
                         } else if (cell.getData().state.equals(State.FAILED)) {
                             cell.resetData();
                             cell.getData().state = State.ACTIVE;
@@ -133,7 +130,6 @@ public class layoutController implements Initializable {
         initCategoriesTree();
     }
 
-    // TODO: add animations to treeView
     private void initCategoriesTree() {
 
         TreeItem<String> root = new TreeItem<>("Root Node");
@@ -208,7 +204,6 @@ public class layoutController implements Initializable {
         });
     }
 
-    // TODO: inshaAllah going to build that hover effect I first designed
     private void initDownloadsList() {
         downloadsList.addListener((ListChangeListener<DownloaderCell>) change -> {
             if (change.next()) {

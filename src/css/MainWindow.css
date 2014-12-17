@@ -1,6 +1,7 @@
 .button {
     -fx-padding: 0;
     -fx-background-color: transparent;
+    -fx-background-radius: 0;
 }
 
 .list-cell {
@@ -93,7 +94,8 @@
 }
 
 #ExitButton {
-    -fx-text-fill: #e74c3c;
+    -fx-text-fill: #f9f9f9;
+    -fx-background-color: #e74c3c;
 }
 
 #BackgroundPane {
@@ -148,3 +150,9 @@
     -fx-background-radius: 0;
 
 }
+
+/* Tool Bar */
+
+/*.tool-bar .button {
+    -fx-padding: 15;
+}*/
