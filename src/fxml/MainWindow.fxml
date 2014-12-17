@@ -69,15 +69,15 @@
               </VBox>
               <ComboBox layoutX="907.0" layoutY="574.0" prefHeight="25.0" prefWidth="116.0" promptText="Unlimited" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" />
               <Label layoutX="817.0" layoutY="577.0" text="Speed Limit:" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="125.0" />
-            <HBox layoutX="200.0" layoutY="73.0" spacing="10.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="0.0">
-               <children>
+            <ToolBar layoutX="200.0" layoutY="73.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="0.0">
+               <items>
                     <Button alignment="CENTER" layoutX="269.0" layoutY="73.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="300.0" styleClass="listButtons" text="Name" textAlignment="CENTER" AnchorPane.leftAnchor="345.0" AnchorPane.topAnchor="73.0" />
                     <Button alignment="CENTER" layoutX="555.0" layoutY="72.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="135.0" styleClass="listButtons" text="Progress" AnchorPane.leftAnchor="525.0" AnchorPane.topAnchor="73.0" />
                     <Button alignment="CENTER" layoutX="647.0" layoutY="73.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="85.0" styleClass="listButtons" text="Speed" AnchorPane.leftAnchor="640.0" AnchorPane.topAnchor="73.0" />
                     <Button alignment="CENTER" layoutX="742.0" layoutY="74.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="90.0" styleClass="listButtons" text="Time" AnchorPane.leftAnchor="738.0" AnchorPane.topAnchor="73.0" />
                     <Button alignment="CENTER" layoutX="831.0" layoutY="67.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefWidth="70.0" styleClass="listButtons" text="Size" AnchorPane.leftAnchor="825.0" AnchorPane.topAnchor="73.0" />
-               </children>
-            </HBox>
+               </items>
+            </ToolBar>
           </children>
          <effect>
             <DropShadow offsetY="1.0" />

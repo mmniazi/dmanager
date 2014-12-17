@@ -153,6 +153,7 @@
 
 /* Tool Bar */
 
-/*.tool-bar .button {
-    -fx-padding: 15;
-}*/
+.tool-bar .button {
+    -fx-background-color: black;
+    -fx-text-fill: white;
+}
