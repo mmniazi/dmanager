@@ -101,6 +101,10 @@
     -fx-background-color: #333333;
 }
 
+#ShadowPane {
+    -fx-background-color: transparent;
+}
+
 /* The main scrollbar **track** CSS class  */
 .scroll-bar:horizontal .track,
 .scroll-bar:vertical .track{

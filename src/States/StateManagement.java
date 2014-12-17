@@ -52,7 +52,7 @@ public class StateManagement {
         return locationMap.containsKey(uri);
     }
 
-    public void changeState(StateData data, String purpose) {
+    public void changeState(StateData data, StateActivity purpose) {
         writingQueue.offer(new QueueData(data, purpose));
     }
 
@@ -99,7 +99,7 @@ public class StateManagement {
                     queueData = writingQueue.take();
                     data = queueData.data;
                     switch (queueData.purpose) {
-                        case "createState":
+                        case CREATE:
                             file.seek(file.length());
                             location = file.getFilePointer();
                             file.writeBytes(data.toString());
@@ -108,12 +108,12 @@ public class StateManagement {
                             file.writeBytes("\n");
                             locationMap.put(data.uri, location);
                             break;
-                        case "saveState":
+                        case SAVE:
                             location = locationMap.get(data.uri);
                             file.seek(location);
                             file.writeBytes(data.toString());
                             break;
-                        case "deleteState":
+                        case DELETE:
                             location = locationMap.get(data.uri);
                             byte[] buffer = new byte[40960];
                             int read;
@@ -138,9 +138,9 @@ public class StateManagement {
     private class QueueData {
 
         StateData data;
-        String purpose;
+        StateActivity purpose;
 
-        public QueueData(StateData data, String purpose) {
+        public QueueData(StateData data, StateActivity purpose) {
             this.data = data;
             this.purpose = purpose;
         }

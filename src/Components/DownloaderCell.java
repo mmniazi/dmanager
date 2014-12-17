@@ -6,6 +6,7 @@
 package Components;
 
 import Controllers.layoutController;
+import States.StateActivity;
 import States.StateData;
 import States.StateManagement;
 import Util.State;
@@ -232,7 +233,7 @@ public class DownloaderCell extends ListCell {
                 }
                 data.state = State.ACTIVE;
                 data.initialized = true;
-                stateManager.changeState(data, "saveState");
+                stateManager.changeState(data, StateActivity.SAVE);
                 stateTransition(false);
             }
             
@@ -251,7 +252,7 @@ public class DownloaderCell extends ListCell {
                 } catch (InterruptedException ex) {
                     Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                stateManager.changeState(data, "saveState");
+                stateManager.changeState(data, StateActivity.SAVE);
                 float averageSpeed = 0;
                 // Calculating
                 float speed = (data.bytesDone.get() - currentBytes);
@@ -314,7 +315,7 @@ public class DownloaderCell extends ListCell {
         } catch (IOException ex) {
             Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
         }
-        stateManager.changeState(data, "saveState");
+        stateManager.changeState(data, StateActivity.SAVE);
         controller.updateActiveDownloads(false);
         Platform.runLater(this::initializeCell);
         stateTransition(false);
@@ -329,7 +330,7 @@ public class DownloaderCell extends ListCell {
         } catch (IOException ex) {
             Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
         }
-        stateManager.changeState(data, "saveState");
+        stateManager.changeState(data, StateActivity.SAVE);
         controller.updateActiveDownloads(false);
         Platform.runLater(this::initializeCell);
         stateTransition(false);
@@ -337,10 +338,11 @@ public class DownloaderCell extends ListCell {
 
     public void delete() {
         try {
-            Files.delete(Paths.get(data.downloadDirectory, data.fileName));
+            System.out.println(Files.deleteIfExists(Paths.get(data.downloadDirectory, data.fileName)));
         } catch (IOException ex) {
             Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
         }
+        stateManager.changeState(data, StateActivity.DELETE);
     }
 
     private void stateTransition(boolean transition) {

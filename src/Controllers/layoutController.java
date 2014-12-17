@@ -3,6 +3,7 @@ package Controllers;
 import Components.AddPopUp;
 import Components.DownloaderCell;
 import Components.InListPopUp;
+import States.StateActivity;
 import States.StateData;
 import States.StateManagement;
 import Util.State;
@@ -283,7 +284,7 @@ public class layoutController implements Initializable {
         } else {
             DownloaderCell cell = new DownloaderCell(data, this);
             downloadsList.add(cell);
-            stateManager.changeState(data, "createState");
+            stateManager.changeState(data, StateActivity.CREATE);
             cell.initializeCell();
         }
     }
