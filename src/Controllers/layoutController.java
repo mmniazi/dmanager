@@ -34,13 +34,14 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javafx.application.Platform;
 
 /**
  * @author muhammad
  */
+    // TODO: Handle file name duplicates
+    // TODO: shadow transperancy not working
 public class layoutController implements Initializable {
 
     ExecutorService threadService;
@@ -64,7 +65,6 @@ public class layoutController implements Initializable {
     @FXML
     private Label totalSpeedLabel;
 
-    // TODO: work on delete button
     @FXML
     private void addButtonController(ActionEvent actionEvent) {
         AddPopUp popUp = new AddPopUp(MainWindow.getScene().getWindow(), this);
@@ -153,10 +153,9 @@ public class layoutController implements Initializable {
         TreeItem<String> failed
                 = new TreeItem<>("Failed", new ImageView(new Image(
                                         getClass().getResourceAsStream("/resources/Red.png"))));
-// Adding all tree items to root item
+
         root.getChildren().addAll(allDownloads, completed, failed, inProgress, paused);
 
-// Defining branches for each tree item
         root.getChildren().stream().forEach((parentItem) -> {
             TreeItem<String> programs = new TreeItem<>("Programs");
             TreeItem<String> compressed = new TreeItem<>("Compressed");
@@ -168,12 +167,10 @@ public class layoutController implements Initializable {
             parentItem.getChildren().addAll(programs, compressed, documents, videos, audio, images, others);
         });
 
-        /*----- Setting the root tree item and hiding root -----*/
         treeView.setRoot(root);
         treeView.setShowRoot(false);
         treeView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-        /*----- When one treeItem is selected expand it and collapse all others -----*/
         treeView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<String>>) change -> {
             if (change.next()) {
                 TreeItem selectedItem = change.getAddedSubList().get(0);
@@ -273,7 +270,6 @@ public class layoutController implements Initializable {
 
     }
 
-    // TODO: Handle file name duplicates
     public void addDownload(StateData data) {
 
         Predicate<DownloaderCell> predicate = cell -> cell.getData().uri.equals(data.uri);

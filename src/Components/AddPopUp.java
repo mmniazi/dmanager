@@ -51,8 +51,8 @@ public class AddPopUp {
     private TextField segmentField;
     @FXML
     private AnchorPane pane;
-    // TODO: start while asking for start
-    // TODO: automatically paste from clip board when popup starts
+    // start while asking for start
+    // automatically paste from clip board when popup starts
     // change image based on file type
     public AddPopUp(Window window, layoutController controller) {
 

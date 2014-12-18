@@ -68,12 +68,12 @@
                <children>
                   <HBox alignment="CENTER" layoutX="223.0" layoutY="575.0">
                      <children>
-                            <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="     Downloads: " textAlignment="CENTER">
+                            <Label alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="     Active Downloads: " textAlignment="CENTER">
                                 <VBox.margin>
                                     <Insets left="5.0" />
                                 </VBox.margin>
                             </Label>
-                        <Label fx:id="totalDownloadsLabel" text="45" />
+                        <Label fx:id="totalDownloadsLabel" text="0" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER" layoutX="471.0" layoutY="575.0">
@@ -83,7 +83,7 @@
                                     <Insets left="5.0" />
                                 </VBox.margin>
                             </Label>
-                        <Label fx:id="totalSpeedLabel" text="553.00 Kb/s" />
+                        <Label fx:id="totalSpeedLabel" text="0" />
                      </children>
                   </HBox>
                </children>

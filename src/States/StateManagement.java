@@ -64,11 +64,8 @@ public class StateManagement {
         long location = 0;
         try {
             while ((stateString = file.readLine()) != null) {
-                //Split the line read into variableStrings
                 stateVariables = stateString.split("::");
-                //Set locationMap
                 locationMap.put(URI.create(stateVariables[1]), location);
-                //add new object to downloadList
                 downloadsList.add(new StateData(
                         stateVariables[0],
                         URI.create(stateVariables[1]),

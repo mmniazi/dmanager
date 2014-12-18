@@ -49,7 +49,15 @@ import java.util.logging.Logger;
  */
 public class DownloaderCell extends ListCell {
 
+    // TODO: Check for user permissions for file(in fact there is a method to add administrator rights to your application)
+    // TODO: Check performance of program.
     // TODO: create a mechanism that will stop download being paused and resumed to quickly && resuming of already completed downloads
+    // TODO: -1 is returned when i try to download calendar data from link.
+    // TODO: if download is paused and resumed instantly then java.io.IOException: Stream Closed is thrown
+    // TODO: if download is paused while connecting.
+    // TODO: safe guard against controller prbutton
+    // TODO: speed calculation giving a bit low results. It can be jugated by increasing the sleep time.
+    // TODO: Download should not be resumed until all threads are closed. Some counter may be used
     private StateManagement stateManager = StateManagement.getInstance();
     private TotalSpeedCalc speedCalc = TotalSpeedCalc.getInstance();
     private layoutController controller;
@@ -88,8 +96,6 @@ public class DownloaderCell extends ListCell {
         }
     }
 
-    // TODO: Check for user permissions for file(in fact there is a method to add administrator rights to your application)
-    // TODO: Check performance of program.
     public void initializeCell() {
         preSetGui();
         switch (data.state) {
@@ -177,10 +183,6 @@ public class DownloaderCell extends ListCell {
         }
     }
 
-    // TODO: -1 is returned when i try to download calendar data from link.
-    // TODO: if download is paused and resumed instantly then java.io.IOException: Stream Closed is thrown
-    // TODO: if download is paused while connecting.
-    // TODO: safe guard against controller prbutton
     private void connect() {
         threadService.execute(() -> {
             try {
@@ -192,7 +194,6 @@ public class DownloaderCell extends ListCell {
             }
             if (!data.initialized) {
                 stateTransition(true);
-                /*----- Getting Size of File -----*/
                 try {
                     HttpGet sizeGet = new HttpGet(data.uri);
                     CloseableHttpResponse sizeResponse = client.execute(sizeGet);
@@ -201,7 +202,6 @@ public class DownloaderCell extends ListCell {
                 } catch (IOException ex) {
                     Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                /*----- Getting Segments for download -----*/
                 try {
                     HttpGet segmentsGet = new HttpGet(data.uri);
                     segmentsGet.setHeader("Range", "bytes=" + 0 + "-" + 1);
@@ -212,7 +212,7 @@ public class DownloaderCell extends ListCell {
                 } catch (IOException ex) {
                     Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
+
                 if (data.segments == 1) {
                     data.initialState = new AtomicLongArray(1);
                     data.finalState = new AtomicLongArray(1);
@@ -226,7 +226,7 @@ public class DownloaderCell extends ListCell {
                         data.initialState.set(i, i * sizeOfEachSegment);
                         data.finalState.set(i, (i + 1) * sizeOfEachSegment);
                     }
-                    
+
                     data.initialState.set(
                             data.segments - 1, data.segments * sizeOfEachSegment);
                     data.finalState.set(data.segments - 1, data.sizeOfFile);
@@ -236,12 +236,11 @@ public class DownloaderCell extends ListCell {
                 stateManager.changeState(data, StateActivity.SAVE);
                 stateTransition(false);
             }
-            
+
             start();
         });
     }
 
-    // TODO: speed calculation giving a bit low results. It can be jugated by increasing the sleep time.
     private void update() {
         threadService.execute(() -> {
             controller.updateActiveDownloads(true);
@@ -254,19 +253,19 @@ public class DownloaderCell extends ListCell {
                 }
                 stateManager.changeState(data, StateActivity.SAVE);
                 float averageSpeed = 0;
-                // Calculating
                 float speed = (data.bytesDone.get() - currentBytes);
                 currentBytes = data.bytesDone.get();
                 list.add(speed);
                 if (list.size() > 5) {
                     list.remove(0);
                 }
+
                 averageSpeed = list.stream()
                         .map((increment) -> increment)
                         .reduce(averageSpeed, (accumulator, _item) -> accumulator + _item);
                 averageSpeed /= list.size();
                 speedCalc.updateTotalSpeed(averageSpeed);
-                // Updating Gui //
+
                 final float finalAverageSpeed = averageSpeed;
                 Platform.runLater(() -> {
                     if (data.sizeOfFile == 0) {
@@ -390,7 +389,7 @@ public class DownloaderCell extends ListCell {
         public Segment(int name) {
             this.name = name;
         }
-        // TODO: jab tak ya threads end nhi hota naya download resume na hona do. Some counter may be used
+
         @Override
         public void run() {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
