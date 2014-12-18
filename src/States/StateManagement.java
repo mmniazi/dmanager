@@ -115,15 +115,15 @@ public class StateManagement {
                             break;
                         case DELETE:
                             location = locationMap.get(data.uri);
-                            byte[] buffer = new byte[40960];
+                            byte[] buffer = new byte[40961];
                             int read;
-                            file.seek(location + 40960);
+                            file.seek(location + 40961);
                             while ((read = file.read(buffer)) > -1) {
-                                file.seek(file.getFilePointer() - read - 40960);
+                                file.seek(file.getFilePointer() - read - 40961);
                                 file.write(buffer, 0, read);
-                                file.seek(file.getFilePointer() + 40960);
+                                file.seek(file.getFilePointer() + 40961);
                             }
-                            file.setLength(file.length() - 40960);
+                            file.setLength(file.length() - 40961);
                             locationMap.remove(data.uri);
                             break;
                     }

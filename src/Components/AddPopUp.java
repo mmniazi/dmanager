@@ -67,6 +67,9 @@ public class AddPopUp {
         popupWindow = new Popup();
         popupWindow.getContent().add(pane);
         popupWindow.show(window);
+        popupWindow.centerOnScreen();
+        popupWindow.setAutoHide(true);
+        
         this.controller = controller;
 
         segmentField.setText(String.valueOf(defaults.getSegments()));
