@@ -27,12 +27,12 @@
             <HBox layoutX="789.0" layoutY="5.0" spacing="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
                <children>
                     <TextField id="SearchBar" layoutX="768.0" layoutY="4.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="150.0" promptText="Search" AnchorPane.rightAnchor="85.0" AnchorPane.topAnchor="5.0" />
-                    <Button id="ExitButton" fx:id="exitButton" layoutX="945.0" layoutY="4.0" mnemonicParsing="false" prefHeight="25.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="5.0">
+                    <Button id="ExitButton" layoutX="945.0" layoutY="4.0" mnemonicParsing="false" onAction="#exitButtonController" prefHeight="25.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="5.0">
                         <font>
                             <Font name="Droid Sans Mono" size="16.0" />
                         </font>
                     </Button>
-                    <Button id="MinimizeButton" layoutX="997.0" layoutY="6.0" mnemonicParsing="false" prefHeight="25.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="5.0" />
+                    <Button id="MinimizeButton" layoutX="997.0" layoutY="6.0" mnemonicParsing="false" onAction="#minimizeButtonController" prefHeight="25.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="5.0" />
                </children>
             </HBox>
               <VBox id="SidePane" layoutX="5.0" layoutY="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">

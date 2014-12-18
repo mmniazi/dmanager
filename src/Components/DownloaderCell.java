@@ -115,7 +115,7 @@ public class DownloaderCell extends ListCell {
                 defaultButton.setText("Pause");
                 connect();
                 update();
-                defaultButton.setOnAction((ActionEvent event) -> stop());
+                defaultButton.setOnAction((ActionEvent event) -> pause());
                 break;
 
             case CMPLTD:
@@ -305,7 +305,7 @@ public class DownloaderCell extends ListCell {
         }
     }
 
-    public void stop() {
+    public void pause() {
         stateTransition(true);
         data.state = State.PAUSED;
         try {

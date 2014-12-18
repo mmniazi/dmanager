@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
@@ -30,6 +31,7 @@ public class StateManagement {
     private BlockingQueue<QueueData> writingQueue;
     private RandomAccessFile file;
     private Map<URI, Long> locationMap = new HashMap<>();
+    private ExecutorService threadService;
 
     protected StateManagement() {
         writingQueue = new LinkedBlockingDeque<>();
@@ -87,7 +89,7 @@ public class StateManagement {
     }
 
     private void startWritingStates() {
-        Thread writer = new Thread(() -> {
+        threadService.execute(() -> {
             QueueData queueData;
             StateData data;
             long location;
@@ -129,7 +131,6 @@ public class StateManagement {
                 }
             }
         });
-        writer.start();
     }
 
     private class QueueData {
@@ -141,6 +142,10 @@ public class StateManagement {
             this.data = data;
             this.purpose = purpose;
         }
-
     }
+
+    public void setThreadService(ExecutorService threadService) {
+        this.threadService = threadService;
+    }
+
 }

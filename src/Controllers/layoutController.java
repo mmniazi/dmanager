@@ -36,12 +36,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 import javafx.application.Platform;
+import javafx.stage.Stage;
 
 /**
  * @author muhammad
  */
     // TODO: Handle file name duplicates
-    // TODO: shadow transperancy not working
 public class layoutController implements Initializable {
 
     ExecutorService threadService;
@@ -61,9 +61,7 @@ public class layoutController implements Initializable {
     @FXML
     private TreeView<String> treeView;
     @FXML
-    private Label totalDownloadsLabel;
-    @FXML
-    private Label totalSpeedLabel;
+    private Label totalDownloadsLabel, totalSpeedLabel;
 
     @FXML
     private void addButtonController(ActionEvent actionEvent) {
@@ -77,7 +75,7 @@ public class layoutController implements Initializable {
                 case PAUSED:
                     listView.getSelectionModel().getSelectedItems().stream().forEach((cell) -> {
                         if (cell.getData().state.equals(State.ACTIVE)) {
-                            cell.stop();
+                            cell.pause();
                         }
                     });
                     prButtonState = ButtonState.RESUMED;
@@ -106,15 +104,29 @@ public class layoutController implements Initializable {
         listView.getSelectionModel().getSelectedItems().forEach((DownloaderCell cell) -> {
             listView.getSelectionModel().clearSelection(listView.getItems().indexOf(cell));
             listView.getItems().remove(cell);
-            cell.stop();
+            cell.pause();
             cell.delete();
         });
+    }
+
+    @FXML
+    private void minimizeButtonController(ActionEvent event) {
+        Stage stage = (Stage) MainWindow.getScene().getWindow();
+        stage.setIconified(true);
+    }
+
+    @FXML
+    private void exitButtonController(ActionEvent event) {
+        threadService.shutdownNow();
+        connectionManager.shutdown();
+        Platform.exit();
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         threadService = Executors.newCachedThreadPool();
         stateManager = StateManagement.getInstance();
+        stateManager.setThreadService(threadService);
         downloadsList = FXCollections.observableArrayList();
         connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(1000);

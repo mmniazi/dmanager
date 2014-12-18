@@ -47,7 +47,7 @@ public class InListPopUp {
 
     @FXML
     private void replaceButtonController(ActionEvent event) {
-        cell.stop();
+        cell.pause();
         cell.setData(data);
         cell.initializeCell();
         popupWindow.hide();
