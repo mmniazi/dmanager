@@ -53,6 +53,6 @@
       </Button>
     </children>
     <effect>
-        <DropShadow offsetY="2.0" />
+        <DropShadow blurType="GAUSSIAN" height="30.0" offsetY="2.0" radius="14.5" width="30.0" />
     </effect>
 </AnchorPane>
