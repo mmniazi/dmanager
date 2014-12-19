@@ -54,6 +54,7 @@ public class AddPopUp {
     // start while asking for start
     // automatically paste from clip board when popup starts
     // change image based on file type
+    // if file is not found on server change text field to red.
     public AddPopUp(Window window, layoutController controller) {
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/AddPopUp.fxml"));

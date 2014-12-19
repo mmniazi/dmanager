@@ -40,7 +40,6 @@ public class StateManagement {
         } catch (FileNotFoundException ex) {
             Logger.getLogger(StateManagement.class.getName()).log(Level.SEVERE, null, ex);
         }
-        startWritingStates();
     }
 
     public static StateManagement getInstance() {
@@ -133,6 +132,11 @@ public class StateManagement {
         });
     }
 
+    public void start(ExecutorService threadService) {
+        this.threadService = threadService;
+        startWritingStates();
+    }
+
     private class QueueData {
 
         StateData data;
@@ -142,10 +146,6 @@ public class StateManagement {
             this.data = data;
             this.purpose = purpose;
         }
-    }
-
-    public void setThreadService(ExecutorService threadService) {
-        this.threadService = threadService;
     }
 
 }

@@ -243,9 +243,11 @@ public class DownloaderCell extends ListCell {
 
     private void update() {
         threadService.execute(() -> {
+            boolean initialPhase = true;
+            int averageSize = 5;
             controller.updateActiveDownloads(true);
             List<Float> list = new ArrayList<>();
-            while (data.state == State.ACTIVE) {
+            for (int counter = 0; data.state == State.ACTIVE; counter++) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
@@ -256,7 +258,10 @@ public class DownloaderCell extends ListCell {
                 float speed = (data.bytesDone.get() - currentBytes);
                 currentBytes = data.bytesDone.get();
                 list.add(speed);
-                if (list.size() > 5) {
+                // TODO: check changes
+                if (counter > 50) initialPhase = false;
+                if (!initialPhase) averageSize = 50;
+                if (list.size() > averageSize) {
                     list.remove(0);
                 }
 
@@ -337,7 +342,7 @@ public class DownloaderCell extends ListCell {
 
     public void delete() {
         try {
-            System.out.println(Files.deleteIfExists(Paths.get(data.downloadDirectory, data.fileName)));
+            Files.deleteIfExists(Paths.get(data.downloadDirectory, data.fileName));
         } catch (IOException ex) {
             Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -361,6 +366,10 @@ public class DownloaderCell extends ListCell {
         return checkBox.isSelected();
     }
 
+    public void setCheckBoxValue(boolean bool) {
+        checkBox.setSelected(bool);
+    }
+
     public CheckBox getCheckBox() {
         return checkBox;
     }
@@ -371,10 +380,6 @@ public class DownloaderCell extends ListCell {
 
     public StateData getData() {
         return data;
-    }
-
-    public void setCheckBoxValue(boolean bool) {
-        checkBox.setSelected(bool);
     }
 
     public void setData(StateData data) {

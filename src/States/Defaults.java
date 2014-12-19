@@ -25,7 +25,7 @@ public class Defaults {
                 downloadLocation = file.readLine();
             } else {
                 segments = 10;
-                downloadLocation = System.getProperty("user.home");
+                downloadLocation = System.getProperty("user.home") + "\\";
                 file.writeBytes("10");
                 file.writeBytes("\n");
                 file.writeBytes(downloadLocation);

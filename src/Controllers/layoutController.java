@@ -8,6 +8,7 @@ import States.StateData;
 import States.StateManagement;
 import Util.State;
 import Util.TotalSpeedCalc;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -23,6 +24,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Paint;
+import javafx.stage.Stage;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -35,8 +37,6 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Predicate;
-import javafx.application.Platform;
-import javafx.stage.Stage;
 
 /**
  * @author muhammad
@@ -126,7 +126,7 @@ public class layoutController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         threadService = Executors.newCachedThreadPool();
         stateManager = StateManagement.getInstance();
-        stateManager.setThreadService(threadService);
+        stateManager.start(threadService);
         downloadsList = FXCollections.observableArrayList();
         connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(1000);
