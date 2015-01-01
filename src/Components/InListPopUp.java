@@ -7,6 +7,7 @@ package Components;
 
 import Controllers.layoutController;
 import States.StateData;
+import Util.StateAction;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -47,9 +48,9 @@ public class InListPopUp {
 
     @FXML
     private void replaceButtonController(ActionEvent event) {
-        cell.pause();
+        cell.change(StateAction.PAUSE);
         cell.setData(data);
-        cell.initializeCell();
+        cell.change(StateAction.INITIALIZE);
         popupWindow.hide();
     }
 

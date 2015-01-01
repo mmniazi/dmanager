@@ -7,6 +7,7 @@ import States.StateActivity;
 import States.StateData;
 import States.StateManagement;
 import Util.State;
+import Util.StateAction;
 import Util.TotalSpeedCalc;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -34,8 +35,6 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 
 /**
@@ -44,7 +43,6 @@ import java.util.function.Predicate;
     // TODO: Handle file name duplicates
 public class layoutController implements Initializable {
 
-    ExecutorService threadService;
     ObservableList<DownloaderCell> downloadsList;
     PoolingHttpClientConnectionManager connectionManager;
     CloseableHttpClient client;
@@ -75,7 +73,7 @@ public class layoutController implements Initializable {
                 case PAUSED:
                     listView.getSelectionModel().getSelectedItems().stream().forEach((cell) -> {
                         if (cell.getData().state.equals(State.ACTIVE)) {
-                            cell.pause();
+                            cell.change(StateAction.PAUSE);
                         }
                     });
                     prButtonState = ButtonState.RESUMED;
@@ -85,11 +83,11 @@ public class layoutController implements Initializable {
                     listView.getSelectionModel().getSelectedItems().stream().forEach((cell) -> {
                         if (cell.getData().state.equals(State.PAUSED)) {
                             cell.getData().state = State.ACTIVE;
-                            cell.initializeCell();
+                            cell.change(StateAction.INITIALIZE);
                         } else if (cell.getData().state.equals(State.FAILED)) {
-                            cell.resetData();
+                            cell.change(StateAction.RESET);
                             cell.getData().state = State.ACTIVE;
-                            cell.initializeCell();
+                            cell.change(StateAction.INITIALIZE);
                         }
                     });
                     prButtonState = ButtonState.PAUSED;
@@ -104,8 +102,8 @@ public class layoutController implements Initializable {
         listView.getSelectionModel().getSelectedItems().forEach((DownloaderCell cell) -> {
             listView.getSelectionModel().clearSelection(listView.getItems().indexOf(cell));
             listView.getItems().remove(cell);
-            cell.pause();
-            cell.delete();
+            cell.change(StateAction.PAUSE);
+            cell.change(StateAction.DELETE);
         });
     }
 
@@ -117,16 +115,15 @@ public class layoutController implements Initializable {
 
     @FXML
     private void exitButtonController(ActionEvent event) {
-        threadService.shutdownNow();
+        downloadsList.forEach(cell -> cell.change(StateAction.SHUTDOWN));
         connectionManager.shutdown();
         Platform.exit();
+        System.exit(0);
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        threadService = Executors.newCachedThreadPool();
         stateManager = StateManagement.getInstance();
-        stateManager.start(threadService);
         downloadsList = FXCollections.observableArrayList();
         connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(1000);
@@ -276,10 +273,9 @@ public class layoutController implements Initializable {
         stateManager.readFromFile().stream().forEach((next) -> {
             DownloaderCell cell = new DownloaderCell(next, this);
             downloadsList.add(cell);
-            cell.initializeCell();
+            cell.change(StateAction.INITIALIZE);
         });
         listView.setItems(downloadsList);
-
     }
 
     public void addDownload(StateData data) {
@@ -293,7 +289,7 @@ public class layoutController implements Initializable {
             DownloaderCell cell = new DownloaderCell(data, this);
             downloadsList.add(cell);
             stateManager.changeState(data, StateActivity.CREATE);
-            cell.initializeCell();
+            cell.change(StateAction.INITIALIZE);
         }
     }
 
@@ -308,8 +304,8 @@ public class layoutController implements Initializable {
         );
     }
 
-    public void updateActiveDownloads(boolean increment) {
-        if (increment) {
+    public void updateActiveDownloads(boolean isIncremented) {
+        if (isIncremented) {
             int activeDownloads = Integer.valueOf(totalDownloadsLabel.getText()) + 1;
             Platform.runLater(() -> totalDownloadsLabel.setText(String.valueOf(activeDownloads)));
             speedCalc.updateActiveDownloads(activeDownloads);
@@ -322,10 +318,6 @@ public class layoutController implements Initializable {
 
     public CloseableHttpClient getClient() {
         return client;
-    }
-
-    public ExecutorService getThreadService() {
-        return threadService;
     }
 }
 

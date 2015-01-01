@@ -7,6 +7,9 @@ package States;
 
 import Util.State;
 import Util.Utilities;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,9 +18,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,18 +28,61 @@ import java.util.logging.Logger;
 public class StateManagement {
 
     private static StateManagement instance = null;
-    private BlockingQueue<QueueData> writingQueue;
+    private ObservableList<dataChange> changeList;
     private RandomAccessFile file;
-    private Map<URI, Long> locationMap = new HashMap<>();
-    private ExecutorService threadService;
+    private Map<URI, Long> locationMap;
 
     protected StateManagement() {
-        writingQueue = new LinkedBlockingDeque<>();
+        locationMap = new HashMap<>();
+        changeList = FXCollections.observableArrayList();
         try {
             file = new RandomAccessFile(System.getProperty("user.home") + "/download.state", "rw");
         } catch (FileNotFoundException ex) {
             Logger.getLogger(StateManagement.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        changeList.addListener((ListChangeListener<dataChange>) change -> {
+            if (change.next()) {
+                change.getAddedSubList().forEach(dataChange -> {
+                    StateData data;
+                    long location;
+                    data = dataChange.data;
+                    try {
+                        switch (dataChange.purpose) {
+                            case CREATE:
+                                file.seek(file.length());
+                                location = file.getFilePointer();
+                                file.writeBytes(data.toString());
+                                file.seek(file.getFilePointer()
+                                        + 40960 - data.toString().length());
+                                file.writeBytes("\n");
+                                locationMap.put(data.uri, location);
+                                break;
+                            case SAVE:
+                                location = locationMap.get(data.uri);
+                                file.seek(location);
+                                file.writeBytes(data.toString());
+                                break;
+                            case DELETE:
+                                location = locationMap.get(data.uri);
+                                byte[] buffer = new byte[40961];
+                                int read;
+                                file.seek(location + 40961);
+                                while ((read = file.read(buffer)) > -1) {
+                                    file.seek(file.getFilePointer() - read - 40961);
+                                    file.write(buffer, 0, read);
+                                    file.seek(file.getFilePointer() + 40961);
+                                }
+                                file.setLength(file.length() - 40961);
+                                locationMap.remove(data.uri);
+                                break;
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(StateManagement.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                });
+            }
+        });
     }
 
     public static StateManagement getInstance() {
@@ -49,12 +92,8 @@ public class StateManagement {
         return instance;
     }
 
-    public boolean stateExsists(URI uri) {
-        return locationMap.containsKey(uri);
-    }
-
     public void changeState(StateData data, StateActivity purpose) {
-        writingQueue.offer(new QueueData(data, purpose));
+        changeList.add(new dataChange(data, purpose));
     }
 
     public ArrayList<StateData> readFromFile() {
@@ -87,62 +126,12 @@ public class StateManagement {
         return downloadsList;
     }
 
-    private void startWritingStates() {
-        threadService.execute(() -> {
-            QueueData queueData;
-            StateData data;
-            long location;
-            while (true) {
-                try {
-                    queueData = writingQueue.take();
-                    data = queueData.data;
-                    switch (queueData.purpose) {
-                        case CREATE:
-                            file.seek(file.length());
-                            location = file.getFilePointer();
-                            file.writeBytes(data.toString());
-                            file.seek(file.getFilePointer()
-                                    + 40960 - data.toString().length());
-                            file.writeBytes("\n");
-                            locationMap.put(data.uri, location);
-                            break;
-                        case SAVE:
-                            location = locationMap.get(data.uri);
-                            file.seek(location);
-                            file.writeBytes(data.toString());
-                            break;
-                        case DELETE:
-                            location = locationMap.get(data.uri);
-                            byte[] buffer = new byte[40961];
-                            int read;
-                            file.seek(location + 40961);
-                            while ((read = file.read(buffer)) > -1) {
-                                file.seek(file.getFilePointer() - read - 40961);
-                                file.write(buffer, 0, read);
-                                file.seek(file.getFilePointer() + 40961);
-                            }
-                            file.setLength(file.length() - 40961);
-                            locationMap.remove(data.uri);
-                            break;
-                    }
-                } catch (InterruptedException | IOException ex) {
-                    Logger.getLogger(StateManagement.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        });
-    }
-
-    public void start(ExecutorService threadService) {
-        this.threadService = threadService;
-        startWritingStates();
-    }
-
-    private class QueueData {
+    private class dataChange {
 
         StateData data;
         StateActivity purpose;
 
-        public QueueData(StateData data, StateActivity purpose) {
+        public dataChange(StateData data, StateActivity purpose) {
             this.data = data;
             this.purpose = purpose;
         }

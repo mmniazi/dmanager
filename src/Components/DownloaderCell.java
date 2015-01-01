@@ -9,10 +9,7 @@ import Controllers.layoutController;
 import States.StateActivity;
 import States.StateData;
 import States.StateManagement;
-import Util.State;
-import Util.TotalSpeedCalc;
-import Util.UriPart;
-import Util.Utilities;
+import Util.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -31,6 +28,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -40,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,10 +55,12 @@ public class DownloaderCell extends ListCell {
     // TODO: if download is paused and resumed instantly then java.io.IOException: Stream Closed is thrown
     // TODO: if download is paused while connecting.
     // TODO: safe guard against controller prbutton
-    // TODO: speed calculation giving a bit low results. It can be jugated by increasing the sleep time.
-    // TODO: Download should not be resumed until all threads are closed. Some counter may be used
-    private StateManagement stateManager = StateManagement.getInstance();
-    private TotalSpeedCalc speedCalc = TotalSpeedCalc.getInstance();
+    // TODO: Use some method of accurate time instead of sleep for exact speed calculation
+    // TODO: Download should not be resumed until all threads are closed. Some counter may be used ** imp
+    // imp: ok make a blocking queue which accepts changes and then make changes appear on all threads when all is updated then implement next change
+
+    private StateManagement stateManager;
+    private TotalSpeedCalc speedCalc;
     private layoutController controller;
     private StateData data;
     private RandomAccessFile file;
@@ -68,6 +69,7 @@ public class DownloaderCell extends ListCell {
     private ExecutorService threadService;
     private long currentBytes;
     private String type;
+    private boolean exiting;
 
     @FXML
     private AnchorPane cell;
@@ -81,11 +83,14 @@ public class DownloaderCell extends ListCell {
     private Label fileLabel, sDoneLabel, sTotalLabel, timeLabel, speedLabel, statusLabel;
 
     public DownloaderCell(StateData data, layoutController controller) {
+        exiting = false;
+        speedCalc = TotalSpeedCalc.getInstance();
+        stateManager = StateManagement.getInstance();
         this.data = data;
         this.currentBytes = data.bytesDone.get();
         this.controller = controller;
         this.client = controller.getClient();
-        this.threadService = controller.getThreadService();
+        this.threadService = Executors.newCachedThreadPool();
         type = Utilities.findType(Utilities.getFromURI(data.uri.toString(), UriPart.EXT));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/ListCell.fxml"));
         fxmlLoader.setController(this);
@@ -96,8 +101,30 @@ public class DownloaderCell extends ListCell {
         }
     }
 
-    public void initializeCell() {
-        preSetGui();
+    public void change(StateAction action) {
+        switch (action) {
+            case DELETE:
+                delete();
+                break;
+            case INITIALIZE:
+                initializeCell();
+                break;
+            case PAUSE:
+                if (data.state.equals(State.ACTIVE)) {
+                    pause();
+                }
+                break;
+            case RESET:
+                resetData();
+                break;
+            case SHUTDOWN:
+                exit();
+                break;
+        }
+    }
+
+    private void initializeCell() {
+        preSetGUI();
         switch (data.state) {
 
             case SHDLED:
@@ -159,16 +186,18 @@ public class DownloaderCell extends ListCell {
                 defaultButton.setText("Resume");
                 defaultButton.setOnAction((ActionEvent event) -> {
                     data.state = State.ACTIVE;
-                    threadService = Executors.newCachedThreadPool();
                     Platform.runLater(this::initializeCell);
+                    threadService = Executors.newCachedThreadPool();
                 });
                 break;
         }
     }
 
-    private void preSetGui() {
+    private void preSetGUI() {
         if (data.sizeOfFile == 0) {
             fileLabel.setText(data.fileName);
+            progressBar.setProgress(0);
+            statusLabel.setText("");
         } else if (data.bytesDone.get() == data.sizeOfFile) {
             fileLabel.setText(data.fileName);
             sTotalLabel.setText(Utilities.sizeConverter(data.sizeOfFile));
@@ -192,8 +221,7 @@ public class DownloaderCell extends ListCell {
                 Logger.getLogger(
                         DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
             }
-            if (!data.initialized) {
-                stateTransition(true);
+            if (!data.initialized && !exiting) {
                 try {
                     HttpGet sizeGet = new HttpGet(data.uri);
                     CloseableHttpResponse sizeResponse = client.execute(sizeGet);
@@ -213,12 +241,12 @@ public class DownloaderCell extends ListCell {
                     Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                if (data.segments == 1) {
+                if (data.segments == 1 && !exiting) {
                     data.initialState = new AtomicLongArray(1);
                     data.finalState = new AtomicLongArray(1);
                     data.initialState.set(0, 0);
                     data.finalState.set(0, data.sizeOfFile);
-                } else {
+                } else if (!exiting) {
                     long sizeOfEachSegment = data.sizeOfFile / data.segments;
                     data.initialState = new AtomicLongArray(data.segments);
                     data.finalState = new AtomicLongArray(data.segments);
@@ -231,10 +259,11 @@ public class DownloaderCell extends ListCell {
                             data.segments - 1, data.segments * sizeOfEachSegment);
                     data.finalState.set(data.segments - 1, data.sizeOfFile);
                 }
-                data.state = State.ACTIVE;
-                data.initialized = true;
-                stateManager.changeState(data, StateActivity.SAVE);
-                stateTransition(false);
+                if (!exiting) {
+                    data.state = State.ACTIVE;
+                    data.initialized = true;
+                    stateManager.changeState(data, StateActivity.SAVE);
+                }
             }
 
             start();
@@ -247,11 +276,10 @@ public class DownloaderCell extends ListCell {
             int averageSize = 5;
             controller.updateActiveDownloads(true);
             List<Float> list = new ArrayList<>();
-            for (int counter = 0; data.state == State.ACTIVE; counter++) {
+            for (int counter = 0; data.state == State.ACTIVE && !exiting; counter++) {
                 try {
                     Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InterruptedException ignored) {
                 }
                 stateManager.changeState(data, StateActivity.SAVE);
                 float averageSpeed = 0;
@@ -303,44 +331,30 @@ public class DownloaderCell extends ListCell {
     }
 
     private void start() {
-        for (int i = 0; i < data.segments; i++) {
+        for (int i = 0; i < data.segments && !exiting; i++) {
             if (data.initialState.get(i) < data.finalState.get(i)) {
                 threadService.execute(new Segment(i));
             }
         }
     }
 
-    public void pause() {
-        stateTransition(true);
+    private void pause() {
         data.state = State.PAUSED;
-        try {
-            fileChannel.close();
-            file.close();
-        } catch (IOException ex) {
-            Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
-        }
         stateManager.changeState(data, StateActivity.SAVE);
         controller.updateActiveDownloads(false);
+        exit();
         Platform.runLater(this::initializeCell);
-        stateTransition(false);
     }
 
     private void complete() {
-        stateTransition(true);
         data.state = State.CMPLTD;
-        try {
-            fileChannel.close();
-            file.close();
-        } catch (IOException ex) {
-            Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
-        }
         stateManager.changeState(data, StateActivity.SAVE);
         controller.updateActiveDownloads(false);
+        exit();
         Platform.runLater(this::initializeCell);
-        stateTransition(false);
     }
 
-    public void delete() {
+    private void delete() {
         try {
             Files.deleteIfExists(Paths.get(data.downloadDirectory, data.fileName));
         } catch (IOException ex) {
@@ -349,13 +363,26 @@ public class DownloaderCell extends ListCell {
         stateManager.changeState(data, StateActivity.DELETE);
     }
 
-    private void stateTransition(boolean transition) {
-        Platform.runLater(() -> defaultButton.setDisable(transition));
-    }
-
-    public void resetData() {
+    private void resetData() {
         data = new StateData(data.downloadDirectory, data.uri,
                 data.downloadDirectory, data.segments);
+    }
+
+    private void exit() {
+        exiting = true;
+        try {
+            fileChannel.close();
+            file.close();
+        } catch (IOException ex) {
+            Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        threadService.shutdown();
+        try {
+            threadService.awaitTermination(5000, TimeUnit.MINUTES);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        exiting = false;
     }
 
     public AnchorPane getCell() {
@@ -397,7 +424,6 @@ public class DownloaderCell extends ListCell {
 
         @Override
         public void run() {
-            Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
             try {
                 HttpGet get = new HttpGet(data.uri);
                 String byteRange = data.initialState.get(name) + "-" + data.finalState.get(name);
@@ -405,21 +431,26 @@ public class DownloaderCell extends ListCell {
                 CloseableHttpResponse response = client.execute(get);
                 ReadableByteChannel inputChannel
                         = Channels.newChannel(response.getEntity().getContent());
-                while (data.state.equals(State.ACTIVE)) {
-                    long BUFFER_SIZE = 1024 * 8;
+
+                ByteBuffer buff = ByteBuffer.allocate(4096);
+                while (data.state.equals(State.ACTIVE) && !exiting) {
                     if ((data.finalState.get(name) - data.initialState.get(name))
-                            >= BUFFER_SIZE) {
-                        fileChannel.transferFrom(
-                                inputChannel, data.initialState.get(name), BUFFER_SIZE);
-                        data.initialState.addAndGet(name, BUFFER_SIZE);
-                        data.bytesDone.addAndGet(BUFFER_SIZE);
+                            >= buff.capacity()) {
+                        inputChannel.read(buff);
+                        buff.flip();
+                        fileChannel.write(buff);
+                        buff.compact();
+                        data.initialState.addAndGet(name, buff.capacity());
+                        data.bytesDone.addAndGet(buff.capacity());
                     } else {
-                        long NEW_BUFFER_SIZE = data.finalState.get(name)
-                                - data.initialState.get(name);
-                        fileChannel.transferFrom(
-                                inputChannel, data.initialState.get(name), NEW_BUFFER_SIZE);
-                        data.initialState.addAndGet(name, NEW_BUFFER_SIZE);
-                        data.bytesDone.addAndGet(NEW_BUFFER_SIZE);
+                        buff = ByteBuffer.allocate((int) (data.finalState.get(name)
+                                - data.initialState.get(name)));
+                        inputChannel.read(buff);
+                        buff.flip();
+                        fileChannel.write(buff);
+                        buff.compact();
+                        data.initialState.addAndGet(name, buff.capacity());
+                        data.bytesDone.addAndGet(buff.capacity());
                         break;
                     }
                 }
@@ -429,7 +460,7 @@ public class DownloaderCell extends ListCell {
                     complete();
                 }
 
-                if (data.state.equals(State.ACTIVE)) {
+                if (data.state.equals(State.ACTIVE) && !exiting) {
                     for (int i = 0; i < data.initialState.length(); i++) {
                         delta = data.finalState.get(i) - data.initialState.get(i);
                         if (delta > 5242880) {
@@ -442,8 +473,7 @@ public class DownloaderCell extends ListCell {
                     }
                 }
 
-            } catch (IOException ex) {
-                Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ignored) {
             }
         }
     }

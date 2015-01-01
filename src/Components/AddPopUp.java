@@ -20,6 +20,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Popup;
+import javafx.stage.PopupWindow;
 import javafx.stage.Window;
 import org.apache.commons.validator.routines.UrlValidator;
 
@@ -69,7 +70,8 @@ public class AddPopUp {
         popupWindow.getContent().add(pane);
         popupWindow.show(window);
         popupWindow.centerOnScreen();
-        popupWindow.setAutoHide(true);
+        popupWindow.setAutoFix(true);
+        popupWindow.setAnchorLocation(PopupWindow.AnchorLocation.WINDOW_TOP_RIGHT);
         
         this.controller = controller;
 
