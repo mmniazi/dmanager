@@ -27,6 +27,8 @@ import org.apache.commons.validator.routines.UrlValidator;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * @author muhammad
@@ -52,6 +54,7 @@ public class AddPopUp {
     private TextField segmentField;
     @FXML
     private AnchorPane pane;
+
     // start while asking for start
     // automatically paste from clip board when popup starts
     // change image based on file type
@@ -72,7 +75,7 @@ public class AddPopUp {
         popupWindow.centerOnScreen();
         popupWindow.setAutoFix(true);
         popupWindow.setAnchorLocation(PopupWindow.AnchorLocation.WINDOW_TOP_RIGHT);
-        
+
         this.controller = controller;
 
         segmentField.setText(String.valueOf(defaults.getSegments()));
@@ -81,7 +84,7 @@ public class AddPopUp {
                 .addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
                     if (urlValidator.isValid(newValue)) {
                         uriField.setId("");
-                        nameField.setText(Utilities.getFromURI(newValue, UriPart.FILENAME_EXT));
+                        nameField.setText(validFileName());
                         startButton.setDisable(false);
                     } else {
                         uriField.setId("Error-Field");
@@ -94,8 +97,7 @@ public class AddPopUp {
     @FXML
     private void startButtonController(ActionEvent event) {
         StateData data = new StateData(locationField.getText(),
-                URI.create(uriField.getText()),
-                Utilities.getFromURI(uriField.getText(), Util.UriPart.FILENAME_EXT), 10);
+                URI.create(uriField.getText()), nameField.getText(), 10);
         controller.addDownload(data);
         popupWindow.hide();
     }
@@ -113,6 +115,25 @@ public class AddPopUp {
         File selectedDirectory = chooser.showDialog(popupWindow);
         if (!(selectedDirectory == null)) {
             locationField.setText(selectedDirectory.toString());
+            nameField.setText(validFileName());
+        }
+    }
+
+    private String validFileName() {
+        String location = locationField.getText();
+        String fileName = Utilities.getFromURI(uriField.getText(), UriPart.FILENAME_EXT);
+        boolean fileExists = Files.exists(Paths.get(location + fileName));
+        if (fileExists) {
+            int counter = 0;
+            while (fileExists) {
+                fileName = Utilities.getFromURI(uriField.getText(), UriPart.FILENAME) +
+                        "(" + ++counter + ")" + "." +
+                        Utilities.getFromURI(uriField.getText(), UriPart.EXT);
+                fileExists = Files.exists(Paths.get(location + fileName));
+            }
+            return fileName;
+        } else {
+            return Utilities.getFromURI(uriField.getText(), UriPart.FILENAME_EXT);
         }
     }
 }

@@ -6,6 +6,7 @@
 package Util;
 
 import Controllers.layoutController;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -26,16 +27,19 @@ public class TotalSpeedCalc {
         this.activeDownloads = new AtomicInteger(0);
     }
 
-    public void setController(layoutController controller) {
-        this.controller = controller;
-    }
-
     public static TotalSpeedCalc getInstance() {
         return instance;
     }
 
+    public void setController(layoutController controller) {
+        this.controller = controller;
+    }
+
     public void updateActiveDownloads(int activeDownloads) {
         this.activeDownloads.set(activeDownloads);
+        this.counter.set(0);
+        this.speed.set(0);
+        if (activeDownloads == 0) controller.updateTotalSpeed(0);
     }
 
     public void updateTotalSpeed(float newSpeed) {
@@ -45,6 +49,5 @@ public class TotalSpeedCalc {
             this.counter.set(0);
             this.speed.set(0);
         }
-
     }
 }

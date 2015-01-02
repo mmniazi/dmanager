@@ -50,7 +50,7 @@ public class InListPopUp {
     private void replaceButtonController(ActionEvent event) {
         cell.change(StateAction.PAUSE);
         cell.setData(data);
-        cell.change(StateAction.INITIALIZE);
+        cell.change(StateAction.START);
         popupWindow.hide();
     }
 

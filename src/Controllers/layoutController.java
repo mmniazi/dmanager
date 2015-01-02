@@ -40,7 +40,7 @@ import java.util.function.Predicate;
 /**
  * @author muhammad
  */
-    // TODO: Handle file name duplicates
+
 public class layoutController implements Initializable {
 
     ObservableList<DownloaderCell> downloadsList;
@@ -49,7 +49,7 @@ public class layoutController implements Initializable {
     StateManagement stateManager;
     ButtonState prButtonState = ButtonState.RESUMED;
     TotalSpeedCalc speedCalc;
-
+    // TODO: problem in deleting multiple downloads
     @FXML
     private Button prButton;
     @FXML
@@ -82,12 +82,9 @@ public class layoutController implements Initializable {
                 case RESUMED:
                     listView.getSelectionModel().getSelectedItems().stream().forEach((cell) -> {
                         if (cell.getData().state.equals(State.PAUSED)) {
-                            cell.getData().state = State.ACTIVE;
-                            cell.change(StateAction.INITIALIZE);
+                            cell.change(StateAction.START);
                         } else if (cell.getData().state.equals(State.FAILED)) {
-                            cell.change(StateAction.RESET);
-                            cell.getData().state = State.ACTIVE;
-                            cell.change(StateAction.INITIALIZE);
+                            cell.change(StateAction.RESTART);
                         }
                     });
                     prButtonState = ButtonState.PAUSED;
@@ -102,7 +99,6 @@ public class layoutController implements Initializable {
         listView.getSelectionModel().getSelectedItems().forEach((DownloaderCell cell) -> {
             listView.getSelectionModel().clearSelection(listView.getItems().indexOf(cell));
             listView.getItems().remove(cell);
-            cell.change(StateAction.PAUSE);
             cell.change(StateAction.DELETE);
         });
     }
@@ -223,7 +219,6 @@ public class layoutController implements Initializable {
                             listView.getSelectionModel().clearSelection(listView.getItems().indexOf(cell));
                         }
                     }));
-
                 }
             }
         });
@@ -269,11 +264,9 @@ public class layoutController implements Initializable {
                 }
             }
         });
-
-        stateManager.readFromFile().stream().forEach((next) -> {
-            DownloaderCell cell = new DownloaderCell(next, this);
+        stateManager.readFromFile().stream().forEach((data) -> {
+            DownloaderCell cell = new DownloaderCell(data, this);
             downloadsList.add(cell);
-            cell.change(StateAction.INITIALIZE);
         });
         listView.setItems(downloadsList);
     }
@@ -286,10 +279,9 @@ public class layoutController implements Initializable {
         if (optionalCell.isPresent()) {
             InListPopUp inListPopUp = new InListPopUp(MainWindow.getScene().getWindow(), this, optionalCell.get(), data);
         } else {
+            stateManager.changeState(data, StateActivity.CREATE);
             DownloaderCell cell = new DownloaderCell(data, this);
             downloadsList.add(cell);
-            stateManager.changeState(data, StateActivity.CREATE);
-            cell.change(StateAction.INITIALIZE);
         }
     }
 
