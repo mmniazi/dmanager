@@ -58,7 +58,7 @@ public class DownloaderCell extends ListCell {
     // TODO: check for problems in complete
     // TODO: how to minimize the popup with parent window
     // TODO: intelligent segmentation for small files
-
+    // TODO: total speed reseting to 0
     private StateManagement stateManager;
     private TotalSpeedCalc speedCalc;
     private layoutController controller;
@@ -394,7 +394,7 @@ public class DownloaderCell extends ListCell {
 
     private long optimizeSegments() {
         long sizeOfEachSegment = data.sizeOfFile / data.segments;
-        if (sizeOfEachSegment >= 1048576) return sizeOfEachSegment;
+        if (sizeOfEachSegment >= 1048576 || data.segments == 1) return sizeOfEachSegment;
         else {
             --data.segments;
             return optimizeSegments();

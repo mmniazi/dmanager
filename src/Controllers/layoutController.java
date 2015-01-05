@@ -63,7 +63,7 @@ public class layoutController implements Initializable {
 
     @FXML
     private void addButtonController(ActionEvent actionEvent) {
-        AddPopUp popUp = new AddPopUp(MainWindow.getScene().getWindow(), this);
+        new AddPopUp(MainWindow.getScene().getWindow(), this);
     }
 
     @FXML
@@ -96,7 +96,7 @@ public class layoutController implements Initializable {
 
     @FXML
     private void deleteButtonController(ActionEvent actionEvent) {
-        listView.getSelectionModel().getSelectedItems().forEach((DownloaderCell cell) -> {
+        listView.getSelectionModel().getSelectedItems().stream().forEach(cell -> {
             listView.getSelectionModel().clearSelection(listView.getItems().indexOf(cell));
             listView.getItems().remove(cell);
             cell.change(StateAction.DELETE);
@@ -277,7 +277,7 @@ public class layoutController implements Initializable {
         Optional<DownloaderCell> optionalCell = downloadsList.stream().filter(predicate).findFirst();
 
         if (optionalCell.isPresent()) {
-            InListPopUp inListPopUp = new InListPopUp(MainWindow.getScene().getWindow(), this, optionalCell.get(), data);
+            new InListPopUp(MainWindow.getScene().getWindow(), this, optionalCell.get(), data);
         } else {
             stateManager.changeState(data, StateActivity.CREATE);
             DownloaderCell cell = new DownloaderCell(data, this);
