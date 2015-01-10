@@ -22,12 +22,14 @@
 
 .text-field {
     -fx-background-radius: 2;
+    -fx-border-radius: 2;
     -fx-border-color: #333333;
     -fx-background-color: #f9f9f9;
 }
 
 .combo-box {
     -fx-background-radius: 2;
+    -fx-border-radius: 2;
     -fx-border-color: #333333;
     -fx-background-color: #f9f9f9;
 }
@@ -37,13 +39,24 @@
     -fx-text-fill: #f9f9f9;
 }
 
-.tree-cell:selected {
+.tree-cell:expanded {
     -fx-background-color: #f9f9f9;
     -fx-text-fill: #333333;
 }
 
 .tree-view {
     -fx-background-color: #333333;
+}
+
+/*----- Removing arrows -----*/
+.tree-cell .tree-disclosure-node .arrow {
+    -fx-shape: null;
+    -fx-background-color: null;
+}
+
+.tree-cell:expanded .tree-disclosure-node .arrow {
+    -fx-shape: null;
+    -fx-background-color: null;
 }
 
 .sidePaneLabel {
@@ -53,6 +66,7 @@
 .listButtons {
     -fx-background-color: #f9f9f9;
 }
+
 #AddButton {
     -fx-graphic: url(../resources/AddButton.png);
 }
@@ -95,50 +109,53 @@
 
 #BackgroundPane {
     -fx-background-color: #f9f9f9;
+    -fx-background-radius: 2;
 }
 
 #SidePane {
     -fx-background-color: #333333;
+    -fx-background-radius: 2 0 0 2;
 }
 
 #ShadowPane {
     -fx-background-color: transparent;
+    -fx-background-radius: 0;
 }
 
 /* The main scrollbar **track** CSS class  */
 .scroll-bar:horizontal .track,
-.scroll-bar:vertical .track{
-    -fx-background-color:#c3c3c3;
+.scroll-bar:vertical .track {
+    -fx-background-color: #c3c3c3;
     -fx-border-color: #f9f9f9;
     -fx-background-radius: 0;
     -fx-border-radius: 0;
-    -fx-background-insets: 2,0,0;
+    -fx-background-insets: 2, 0, 0;
 }
 
 /* The increment and decrement button CSS class of scrollbar */
-.scroll-bar:horizontal .increment-button ,
+.scroll-bar:horizontal .increment-button,
 .scroll-bar:horizontal .decrement-button {
-    -fx-background-color:#f9f9f9;
+    -fx-background-color: #f9f9f9;
     -fx-background-radius: 0;
-    -fx-padding:0 0 10 0;
+    -fx-padding: 0 0 10 0;
 
 }
 
 /* The increment and decrement button CSS class of scrollbar */
 
-.scroll-bar:vertical .increment-button ,
+.scroll-bar:vertical .increment-button,
 .scroll-bar:vertical .decrement-button {
 
-    -fx-background-color:#f9f9f9;
+    -fx-background-color: #f9f9f9;
     -fx-background-radius: 0;
-    -fx-padding:0 10 0 0;
+    -fx-padding: 0 10 0 0;
 
 }
 
 .scroll-bar .increment-arrow,
 .scroll-bar .decrement-arrow {
-    -fx-shape: " ";	
-    -fx-padding:0;
+    -fx-shape: " ";
+    -fx-padding: 0;
 }
 
 /* The main scrollbar **thumb** CSS class which we drag every time (movable) */

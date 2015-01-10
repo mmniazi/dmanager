@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.*?>
-<?import javafx.scene.effect.*?>
-<?import java.lang.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
-<AnchorPane id="ShadowPane" stylesheets="@../css/MainWindow.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.layoutController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="ShadowPane" stylesheets="@../css/MainWindow.css"
+            xmlns="http://javafx.com/javafx/8" fx:controller="Controllers.layoutController">
    <children>
       <AnchorPane id="BackgroundPane" fx:id="MainWindow" layoutX="9.0" layoutY="9.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
           <children>
@@ -26,16 +23,24 @@
               <ListView id="ListView" fx:id="listView" focusTraversable="false" layoutX="194.0" layoutY="119.0" prefHeight="470.0" prefWidth="819.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="70.0" />
             <HBox layoutX="789.0" layoutY="5.0" spacing="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
                <children>
-                    <TextField id="SearchBar" layoutX="768.0" layoutY="4.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="150.0" promptText="Search" AnchorPane.rightAnchor="85.0" AnchorPane.topAnchor="5.0" />
-                    <Button id="ExitButton" layoutX="945.0" layoutY="4.0" mnemonicParsing="false" onAction="#exitButtonController" prefHeight="25.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="5.0">
+                   <TextField id="SearchBar" layoutX="768.0" layoutY="4.0" maxHeight="-Infinity" maxWidth="-Infinity"
+                              minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" promptText="Search"
+                              AnchorPane.rightAnchor="85.0" AnchorPane.topAnchor="5.0"/>
+                   <Button id="ExitButton" layoutX="945.0" layoutY="4.0" mnemonicParsing="false"
+                           onAction="#exitButtonController" prefHeight="27.0" AnchorPane.rightAnchor="40.0"
+                           AnchorPane.topAnchor="5.0">
                         <font>
                             <Font name="Droid Sans Mono" size="16.0" />
                         </font>
                     </Button>
-                    <Button id="MinimizeButton" layoutX="997.0" layoutY="6.0" mnemonicParsing="false" onAction="#minimizeButtonController" prefHeight="25.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="5.0" />
+                   <Button id="MinimizeButton" layoutX="997.0" layoutY="6.0" mnemonicParsing="false"
+                           onAction="#minimizeButtonController" prefHeight="27.0" AnchorPane.rightAnchor="15.0"
+                           AnchorPane.topAnchor="5.0"/>
                </children>
             </HBox>
-              <VBox id="SidePane" layoutX="5.0" layoutY="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <VBox id="SidePane" layoutX="5.0" layoutY="20.0" maxHeight="-Infinity" maxWidth="-Infinity"
+                    minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="200.0"
+                    AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="-1.0" AnchorPane.topAnchor="-1.0">
                   <children>
                       <HBox layoutX="14.0" layoutY="48.0" spacing="20.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="20.0">
                           <children>
@@ -59,8 +64,10 @@
               </VBox>
             <HBox layoutX="817.0" layoutY="570.0" spacing="10.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="10.0">
                <children>
-                    <Label layoutX="817.0" layoutY="577.0" prefHeight="25.0" text="Speed Limit:" AnchorPane.bottomAnchor="10.0" />
-                    <ComboBox layoutX="907.0" layoutY="574.0" prefHeight="25.0" prefWidth="116.0" promptText="Unlimited" AnchorPane.bottomAnchor="5.0" />
+                   <Label layoutX="817.0" layoutY="577.0" prefHeight="27.0" text="Speed Limit:"
+                          AnchorPane.bottomAnchor="10.0"/>
+                   <ComboBox layoutX="907.0" layoutY="574.0" prefWidth="116.0" promptText="Unlimited"
+                             AnchorPane.bottomAnchor="5.0"/>
                </children>
             </HBox>
             <Separator AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="50.0" />
@@ -90,7 +97,7 @@
             </HBox>
           </children>
          <effect>
-            <DropShadow blurType="GAUSSIAN" height="30.0" radius="14.5" width="30.0" />
+             <DropShadow blurType="GAUSSIAN" height="30.0" radius="14.5" spread="0.2" width="30.0"/>
          </effect>
       </AnchorPane>
    </children>

@@ -5,6 +5,7 @@
  */
 package States;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.logging.Level;
@@ -25,7 +26,7 @@ public class Defaults {
                 downloadLocation = file.readLine();
             } else {
                 segments = 10;
-                downloadLocation = System.getProperty("user.home") + "\\";
+                downloadLocation = System.getProperty("user.home") + File.separator;
                 file.writeBytes("10");
                 file.writeBytes("\n");
                 file.writeBytes(downloadLocation);

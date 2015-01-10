@@ -10,12 +10,14 @@ import States.Defaults;
 import States.StateData;
 import Util.UriPart;
 import Util.Utilities;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.DirectoryChooser;
@@ -39,6 +41,8 @@ public class AddPopUp {
     Defaults defaults = new Defaults();
     UrlValidator urlValidator = new UrlValidator();
     layoutController controller;
+    Window window;
+    ChangeListener<Boolean> focusListener;
 
     @FXML
     private Button startButton;
@@ -59,7 +63,10 @@ public class AddPopUp {
     // automatically paste from clip board when popup starts
     // change image based on file type
     // if file is not found on server change text field to red.
-    public AddPopUp(Window window, layoutController controller) {
+
+    public AddPopUp(layoutController controller, AnchorPane mainWindow) {
+        this.controller = controller;
+        this.window = mainWindow.getScene().getWindow();
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/AddPopUp.fxml"));
         fxmlLoader.setController(this);
@@ -71,12 +78,19 @@ public class AddPopUp {
 
         popupWindow = new Popup();
         popupWindow.getContent().add(pane);
+
+        popupWindow.setOnShown(event -> mainWindow.setEffect(new GaussianBlur(7)));
+        popupWindow.setOnHidden(event -> mainWindow.setEffect(null));
+
         popupWindow.show(window);
         popupWindow.centerOnScreen();
         popupWindow.setAutoFix(true);
         popupWindow.setAnchorLocation(PopupWindow.AnchorLocation.WINDOW_TOP_RIGHT);
-
-        this.controller = controller;
+        focusListener = (observable, oldValue, newValue) -> {
+            if (newValue) popupWindow.show(window);
+            else popupWindow.hide();
+        };
+        window.focusedProperty().addListener(focusListener);
 
         segmentField.setText(String.valueOf(defaults.getSegments()));
         locationField.setText(defaults.getDownloadLocation());
@@ -99,11 +113,13 @@ public class AddPopUp {
         StateData data = new StateData(locationField.getText(),
                 URI.create(uriField.getText()), nameField.getText(), 10);
         controller.addDownload(data);
+        window.focusedProperty().removeListener(focusListener);
         popupWindow.hide();
     }
 
     @FXML
     private void cancelButtonController(ActionEvent event) {
+        window.focusedProperty().removeListener(focusListener);
         popupWindow.hide();
     }
 

@@ -8,6 +8,7 @@ package Components;
 import Controllers.layoutController;
 import States.StateData;
 import Util.StateAction;
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,11 +27,18 @@ public class InListPopUp {
     private final layoutController controller;
     private final DownloaderCell cell;
     private final StateData data;
+    private final Window window;
+    ChangeListener<Boolean> focusListener;
 
     @FXML
     private AnchorPane pane;
 
-    public InListPopUp(Window window, layoutController controller, DownloaderCell cell, StateData data) {
+    public InListPopUp(AnchorPane mainWindow, layoutController controller, DownloaderCell cell, StateData data) {
+        window = mainWindow.getScene().getWindow();
+        this.controller = controller;
+        this.cell = cell;
+        this.data = data;
+
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/InListPopUp.fxml"));
         fxmlLoader.setController(this);
         try {
@@ -41,27 +49,33 @@ public class InListPopUp {
         popupWindow = new Popup();
         popupWindow.getContent().add(pane);
         popupWindow.show(window);
-        this.controller = controller;
-        this.cell = cell;
-        this.data = data;
+
+        focusListener = (observable, oldValue, newValue) -> {
+            if (newValue) popupWindow.show(window);
+            else popupWindow.hide();
+        };
+        window.focusedProperty().addListener(focusListener);
     }
 
     @FXML
     private void replaceButtonController(ActionEvent event) {
-        cell.change(StateAction.PAUSE);
+        cell.change(StateAction.DELETE);
         cell.setData(data);
         cell.change(StateAction.START);
+        window.focusedProperty().removeListener(focusListener);
         popupWindow.hide();
     }
 
     @FXML
     private void viewButtonController(ActionEvent event) {
         controller.showDownload(cell);
+        window.focusedProperty().removeListener(focusListener);
         popupWindow.hide();
     }
 
     @FXML
     private void cancelButtonController(ActionEvent event) {
+        window.focusedProperty().removeListener(focusListener);
         popupWindow.hide();
     }
 }

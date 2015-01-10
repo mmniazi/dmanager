@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -48,17 +47,10 @@ import java.util.logging.Logger;
 public class DownloaderCell extends ListCell {
 
     // TODO: Check for user permissions for file(in fact there is a method to add administrator rights to your application)
-    // TODO: Check performance of program.
     // TODO: -1 is returned when i try to download calendar data from link.
-    // TODO: if download is paused while connecting.
     // TODO: Use some method of accurate time instead of sleep for exact speed calculation
-    // TODO: nagios download giving insane outputs
     // TODO: handle failed downloads
-    // TODO: total speed dont updates after pause resume cycle
-    // TODO: check for problems in complete
-    // TODO: how to minimize the popup with parent window
-    // TODO: intelligent segmentation for small files
-    // TODO: total speed reseting to 0
+    // TODO: open and open in folder not working
     private StateManagement stateManager;
     private TotalSpeedCalc speedCalc;
     private layoutController controller;
@@ -295,13 +287,14 @@ public class DownloaderCell extends ListCell {
                     Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                if (data.segments == 1 && !exiting) {
+                long sizeOfEachSegment = optimizeSegments();
+
+                if (data.segments == 1) {
                     data.initialState = new AtomicLongArray(1);
                     data.finalState = new AtomicLongArray(1);
                     data.initialState.set(0, 0);
                     data.finalState.set(0, data.sizeOfFile);
-                } else if (!exiting) {
-                    long sizeOfEachSegment = optimizeSegments();
+                } else {
                     data.initialState = new AtomicLongArray(data.segments);
                     data.finalState = new AtomicLongArray(data.segments);
                     for (int i = 0; i < data.segments - 1; i++) {
@@ -330,10 +323,6 @@ public class DownloaderCell extends ListCell {
             controller.updateActiveDownloads(true);
             List<Float> list = new ArrayList<>();
             for (int counter = 0; data.state == State.ACTIVE && !exiting; counter++) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ignored) {
-                }
                 stateManager.changeState(data, StateActivity.SAVE);
                 float averageSpeed = 0;
                 float speed = (data.bytesDone.get() - currentBytes);
@@ -380,6 +369,11 @@ public class DownloaderCell extends ListCell {
                         statusLabel.setText("(" + (data.bytesDone.get() * 100) / data.sizeOfFile + "%" + ")");
                     }
                 });
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored) {
+                }
             }
         });
     }
@@ -394,7 +388,7 @@ public class DownloaderCell extends ListCell {
 
     private long optimizeSegments() {
         long sizeOfEachSegment = data.sizeOfFile / data.segments;
-        if (sizeOfEachSegment >= 1048576 || data.segments == 1) return sizeOfEachSegment;
+        if (sizeOfEachSegment >= 1024 * 1024 || data.segments == 1) return sizeOfEachSegment;
         else {
             --data.segments;
             return optimizeSegments();
@@ -448,25 +442,21 @@ public class DownloaderCell extends ListCell {
                 ReadableByteChannel inputChannel
                         = Channels.newChannel(response.getEntity().getContent());
 
-                ByteBuffer buff = ByteBuffer.allocate(4096);
+                long BUFFER_SIZE = 1024 * 8;
                 while (data.state.equals(State.ACTIVE) && !exiting) {
                     if ((data.finalState.get(name) - data.initialState.get(name))
-                            >= buff.capacity()) {
-                        inputChannel.read(buff);
-                        buff.flip();
-                        fileChannel.write(buff);
-                        buff.compact();
-                        data.initialState.addAndGet(name, buff.capacity());
-                        data.bytesDone.addAndGet(buff.capacity());
+                            >= BUFFER_SIZE) {
+                        fileChannel.transferFrom(
+                                inputChannel, data.initialState.get(name), BUFFER_SIZE);
+                        data.initialState.addAndGet(name, BUFFER_SIZE);
+                        data.bytesDone.addAndGet(BUFFER_SIZE);
                     } else {
-                        buff = ByteBuffer.allocate((int) (data.finalState.get(name)
-                                - data.initialState.get(name)));
-                        inputChannel.read(buff);
-                        buff.flip();
-                        fileChannel.write(buff);
-                        buff.compact();
-                        data.initialState.addAndGet(name, buff.capacity());
-                        data.bytesDone.addAndGet(buff.capacity());
+                        long NEW_BUFFER_SIZE = data.finalState.get(name)
+                                - data.initialState.get(name);
+                        fileChannel.transferFrom(
+                                inputChannel, data.initialState.get(name), NEW_BUFFER_SIZE);
+                        data.initialState.addAndGet(name, NEW_BUFFER_SIZE);
+                        data.bytesDone.addAndGet(NEW_BUFFER_SIZE);
                         break;
                     }
                 }
@@ -479,7 +469,7 @@ public class DownloaderCell extends ListCell {
                 if (data.state.equals(State.ACTIVE) && !exiting) {
                     for (int i = 0; i < data.initialState.length(); i++) {
                         delta = data.finalState.get(i) - data.initialState.get(i);
-                        if (delta > 0.05 * data.sizeOfFile) {
+                        if (delta > 0.05 * data.sizeOfFile && delta > 1024 * 1024) {
                             data.finalState.set(name, data.finalState.get(i));
                             data.finalState.set(i, data.finalState.get(i) - delta / 2);
                             data.initialState.set(name, data.finalState.get(i));

@@ -33,6 +33,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
@@ -49,7 +51,10 @@ public class layoutController implements Initializable {
     StateManagement stateManager;
     ButtonState prButtonState = ButtonState.RESUMED;
     TotalSpeedCalc speedCalc;
-    // TODO: problem in deleting multiple downloads
+    int activeDownloads;
+    // TODO: 2nd download is not deleting in case of 3
+    // TODO: if paused all downloads get deleted
+    // TODO: delete module is working correctly and location is getting deleted
     @FXML
     private Button prButton;
     @FXML
@@ -63,7 +68,7 @@ public class layoutController implements Initializable {
 
     @FXML
     private void addButtonController(ActionEvent actionEvent) {
-        new AddPopUp(MainWindow.getScene().getWindow(), this);
+        new AddPopUp(this, MainWindow);
     }
 
     @FXML
@@ -96,8 +101,9 @@ public class layoutController implements Initializable {
 
     @FXML
     private void deleteButtonController(ActionEvent actionEvent) {
-        listView.getSelectionModel().getSelectedItems().stream().forEach(cell -> {
-            listView.getSelectionModel().clearSelection(listView.getItems().indexOf(cell));
+        List<DownloaderCell> deleteList = new LinkedList<>(listView.getSelectionModel().getSelectedItems());
+        listView.getSelectionModel().clearSelection();
+        deleteList.forEach(cell -> {
             listView.getItems().remove(cell);
             cell.change(StateAction.DELETE);
         });
@@ -119,6 +125,7 @@ public class layoutController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        activeDownloads = 0;
         stateManager = StateManagement.getInstance();
         downloadsList = FXCollections.observableArrayList();
         connectionManager = new PoolingHttpClientConnectionManager();
@@ -145,7 +152,15 @@ public class layoutController implements Initializable {
         TreeItem<String> allDownloads
                 = new TreeItem<>("All Downloads", new ImageView(new Image(
                                         getClass().getResourceAsStream("/resources/White.png"))));
+
+        allDownloads.expandedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) allDownloads.setGraphic(new ImageView(new Image(
+                    getClass().getResourceAsStream("/resources/Black.png"))));
+            else allDownloads.setGraphic(new ImageView(new Image(
+                    getClass().getResourceAsStream("/resources/White.png"))));
+        });
         allDownloads.setExpanded(true);
+
         TreeItem<String> inProgress
                 = new TreeItem<>("Downloading", new ImageView(new Image(
                                         getClass().getResourceAsStream("/resources/Green.png"))));
@@ -226,7 +241,6 @@ public class layoutController implements Initializable {
         listView.getSelectionModel().getSelectedItems()
                 .addListener((ListChangeListener<DownloaderCell>) change -> {
                     if (change.next()) {
-
                         if (change.wasRemoved()) {
                             change.getRemoved().stream().forEach(cell -> cell.setCheckBoxValue(false));
                         }
@@ -277,7 +291,7 @@ public class layoutController implements Initializable {
         Optional<DownloaderCell> optionalCell = downloadsList.stream().filter(predicate).findFirst();
 
         if (optionalCell.isPresent()) {
-            new InListPopUp(MainWindow.getScene().getWindow(), this, optionalCell.get(), data);
+            new InListPopUp(MainWindow, this, optionalCell.get(), data);
         } else {
             stateManager.changeState(data, StateActivity.CREATE);
             DownloaderCell cell = new DownloaderCell(data, this);
@@ -298,12 +312,10 @@ public class layoutController implements Initializable {
 
     public void updateActiveDownloads(boolean isIncremented) {
         if (isIncremented) {
-            int activeDownloads = Integer.valueOf(totalDownloadsLabel.getText()) + 1;
-            Platform.runLater(() -> totalDownloadsLabel.setText(String.valueOf(activeDownloads)));
+            Platform.runLater(() -> totalDownloadsLabel.setText(String.valueOf(++activeDownloads)));
             speedCalc.updateActiveDownloads(activeDownloads);
         } else {
-            int activeDownloads = Integer.valueOf(totalDownloadsLabel.getText()) - 1;
-            Platform.runLater(() -> totalDownloadsLabel.setText(String.valueOf(activeDownloads)));
+            Platform.runLater(() -> totalDownloadsLabel.setText(String.valueOf(--activeDownloads)));
             speedCalc.updateActiveDownloads(activeDownloads);
         }
     }
