@@ -13,9 +13,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
@@ -29,10 +29,10 @@ public class StateManagement {
     private static StateManagement instance = null;
     private BlockingQueue<dataChange> changeList;
     private RandomAccessFile file;
-    private Map<URI, Long> locationMap;
+    private ConcurrentMap<URI, Long> locationMap;
 
     protected StateManagement() {
-        locationMap = new HashMap<>();
+        locationMap = new ConcurrentHashMap<>();
         changeList = new LinkedBlockingQueue<>();
         try {
             file = new RandomAccessFile(System.getProperty("user.home") + "/download.state", "rw");
@@ -64,7 +64,7 @@ public class StateManagement {
                         file.seek(file.length());
                         location = file.getFilePointer();
                         file.writeBytes(data.toString());
-                        file.seek(location + 409600);
+                        file.seek(location + 40960);
                         file.writeBytes("\n");
                         locationMap.put(data.uri, location);
                         break;
@@ -77,15 +77,15 @@ public class StateManagement {
                         break;
                     case DELETE:
                         location = locationMap.get(data.uri);
-                        locationMap.remove(data.uri, location);
-                        byte[] buffer = new byte[409601];
-                        file.seek(location + 409601);
+                        locationMap.remove(data.uri);
+                        byte[] buffer = new byte[40961];
+                        file.seek(location + 40961);
                         for (int i = 0; file.read(buffer) > -1; i++) {
-                            file.seek(location + i * 409601);
+                            file.seek(location + i * 40961);
                             file.write(buffer);
-                            file.seek(location + (i + 2) * 409601);
+                            file.seek(location + (i + 2) * 40961);
                         }
-                        file.setLength(file.length() - 409601);
+                        file.setLength(file.length() - 40961);
                         break;
                 }
             } catch (IOException | InterruptedException ex) {
@@ -142,5 +142,4 @@ public class StateManagement {
             this.purpose = purpose;
         }
     }
-
 }

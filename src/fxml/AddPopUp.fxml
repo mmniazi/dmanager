@@ -47,7 +47,9 @@
                 <Font name="Dense-Regular" size="13.0" />
             </font>
         </Button>
-        <Button layoutX="500.0" layoutY="62.0" mnemonicParsing="false" onAction="#cancelButtonController" prefHeight="26.0" prefWidth="100.0" text="Cancel" textFill="#f9f9f9" AnchorPane.bottomAnchor="62.0" AnchorPane.topAnchor="61.0">
+        <Button cancelButton="true" layoutX="500.0" layoutY="62.0" mnemonicParsing="false"
+                onAction="#cancelButtonController" prefHeight="26.0" prefWidth="100.0" text="Cancel" textFill="#f9f9f9"
+                AnchorPane.bottomAnchor="62.0" AnchorPane.topAnchor="61.0">
          <font>
             <Font name="Dense-Regular" size="13.0" />
          </font>

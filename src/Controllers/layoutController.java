@@ -20,6 +20,8 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -52,9 +54,13 @@ public class layoutController implements Initializable {
     ButtonState prButtonState = ButtonState.RESUMED;
     TotalSpeedCalc speedCalc;
     int activeDownloads;
-    // TODO: 2nd download is not deleting in case of 3
-    // TODO: if paused all downloads get deleted
-    // TODO: delete module is working correctly and location is getting deleted
+    /*
+    TODO: 2nd download is not deleting in case of 3
+    if paused all downloads get deleted
+    delete module is working correctly and location is getting deleted
+    problem is with changeState -> SAVE of update
+    */
+    // make dmanager minimize to task bar
     @FXML
     private Button prButton;
     @FXML
@@ -142,6 +148,22 @@ public class layoutController implements Initializable {
                 build();
         initDownloadsList();
         initCategoriesTree();
+        setKeyMapping();
+    }
+
+    private void setKeyMapping() {
+        MainWindow.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.isControlDown() && event.getCode() == KeyCode.A)
+                listView.getSelectionModel().selectAll();
+            else if (event.isControlDown() && event.getCode() == KeyCode.O)
+                addButtonController(new ActionEvent());
+            else if (event.isControlDown() && event.getCode() == KeyCode.P)
+                prButtonController(new ActionEvent());
+            else if (event.getCode() == KeyCode.DELETE)
+                deleteButtonController(new ActionEvent());
+            else if (event.isAltDown() && event.getCode() == KeyCode.F4)
+                exitButtonController(new ActionEvent());
+        });
     }
 
     private void initCategoriesTree() {
@@ -151,7 +173,7 @@ public class layoutController implements Initializable {
 
         TreeItem<String> allDownloads
                 = new TreeItem<>("All Downloads", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/White.png"))));
+                getClass().getResourceAsStream("/resources/White.png"))));
 
         allDownloads.expandedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) allDownloads.setGraphic(new ImageView(new Image(
@@ -163,16 +185,16 @@ public class layoutController implements Initializable {
 
         TreeItem<String> inProgress
                 = new TreeItem<>("Downloading", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Green.png"))));
+                getClass().getResourceAsStream("/resources/Green.png"))));
         TreeItem<String> completed
                 = new TreeItem<>("Completed", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Blue.png"))));
+                getClass().getResourceAsStream("/resources/Blue.png"))));
         TreeItem<String> paused
                 = new TreeItem<>("Paused", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Orange.png"))));
+                getClass().getResourceAsStream("/resources/Orange.png"))));
         TreeItem<String> failed
                 = new TreeItem<>("Failed", new ImageView(new Image(
-                                        getClass().getResourceAsStream("/resources/Red.png"))));
+                getClass().getResourceAsStream("/resources/Red.png"))));
 
         root.getChildren().addAll(allDownloads, completed, failed, inProgress, paused);
 
@@ -306,7 +328,7 @@ public class layoutController implements Initializable {
 
     public void updateTotalSpeed(int speed) {
         Platform.runLater(()
-                -> totalSpeedLabel.setText(Util.Utilities.speedConverter(speed))
+                        -> totalSpeedLabel.setText(Util.Utilities.speedConverter(speed))
         );
     }
 
@@ -326,10 +348,12 @@ public class layoutController implements Initializable {
 }
 
 /*----- Download Links -----*/
-// http://softlayer-sng.dl.sourceforge.net/project/elementaryos/unstable/elementaryos-unstable-amd64.20140810.iso
-// https://www.google.com/calendar/ical/tk5scqbfe80ffdcfj86uppbhvk%40group.calendar.google.com/private-0dfe7855fa8b78365041b2b27261446e/basic.ics
-// http://downloads.sourceforge.net/project/sevenzip/7-Zip/9.22/7z922.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fsevenzip%2F&ts=1415925898&use_mirror=kaz
-// http://software-files-a.cnet.com/s/software/13/91/24/11/avast_free_antivirus_setup_online.exe?token=1417263074_0969cea50d1231fcf1d9c961806461d7&fileName=avast_free_antivirus_setup_online.exe
-// http://downloads.sourceforge.net/project/openofficeorg.mirror/4.1.1/binaries/en-US/Apache_OpenOffice_4.1.1_Linux_x86-64_install-rpm_en-US.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fopenofficeorg.mirror%2F%3Fsource%3Ddirectory-featured&ts=1417228120&use_mirror=softlayer-sng
-// http://downloads.sourceforge.net/project/nagios/nagios-4.x/nagios-4.0.8/nagios-4.0.8.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fdirectory%2Fbusiness-enterprise%2Fos%3Alinux%2Ffreshness%3Arecently-updated%2F&ts=1417228511&use_mirror=softlayer-sng
+/*
+http://softlayer-sng.dl.sourceforge.net/project/elementaryos/unstable/elementaryos-unstable-amd64.20140810.iso
+https://www.google.com/calendar/ical/tk5scqbfe80ffdcfj86uppbhvk%40group.calendar.google.com/private-0dfe7855fa8b78365041b2b27261446e/basic.ics
+http://downloads.sourceforge.net/project/sevenzip/7-Zip/9.22/7z922.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fsevenzip%2F&ts=1415925898&use_mirror=kaz
+http://software-files-a.cnet.com/s/software/13/91/24/11/avast_free_antivirus_setup_online.exe?token=1417263074_0969cea50d1231fcf1d9c961806461d7&fileName=avast_free_antivirus_setup_online.exe
+http://downloads.sourceforge.net/project/openofficeorg.mirror/4.1.1/binaries/en-US/Apache_OpenOffice_4.1.1_Linux_x86-64_install-rpm_en-US.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fopenofficeorg.mirror%2F%3Fsource%3Ddirectory-featured&ts=1417228120&use_mirror=softlayer-sng
+http://downloads.sourceforge.net/project/nagios/nagios-4.x/nagios-4.0.8/nagios-4.0.8.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fdirectory%2Fbusiness-enterprise%2Fos%3Alinux%2Ffreshness%3Arecently-updated%2F&ts=1417228511&use_mirror=softlayer-sng
+*/
 
