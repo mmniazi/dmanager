@@ -64,8 +64,7 @@ public class StateManagement {
                         file.seek(file.length());
                         location = file.getFilePointer();
                         file.writeBytes(data.toString());
-                        file.seek(location + 40960);
-                        file.writeBytes("\n");
+                        for (int i = 0; i < 1024 - data.toString().length(); i++) file.writeByte(32);
                         locationMap.put(data.uri, location);
                         break;
                     case SAVE:
@@ -77,15 +76,15 @@ public class StateManagement {
                         break;
                     case DELETE:
                         location = locationMap.get(data.uri);
-                        locationMap.remove(data.uri);
-                        byte[] buffer = new byte[40961];
-                        file.seek(location + 40961);
+                        locationMap.remove(data.uri, location);
+                        byte[] buffer = new byte[1024];
+                        file.seek(location + 1024);
                         for (int i = 0; file.read(buffer) > -1; i++) {
-                            file.seek(location + i * 40961);
+                            file.seek(location + i * 1024);
                             file.write(buffer);
-                            file.seek(location + (i + 2) * 40961);
+                            file.seek(location + (i + 2) * 1024);
                         }
-                        file.setLength(file.length() - 40961);
+                        file.setLength(file.length() - 1024);
                         break;
                 }
             } catch (IOException | InterruptedException ex) {
