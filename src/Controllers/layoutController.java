@@ -54,13 +54,8 @@ public class layoutController implements Initializable {
     ButtonState prButtonState = ButtonState.RESUMED;
     TotalSpeedCalc speedCalc;
     int activeDownloads;
-    /*
-    TODO: 2nd download is not deleting in case of 3
-    if paused all downloads get deleted
-    delete module is working correctly and location is getting deleted
-    problem is with changeState -> SAVE of update
-    */
     // make dmanager minimize to task bar
+    // TODO: after add popup shadow disappears
     @FXML
     private Button prButton;
     @FXML

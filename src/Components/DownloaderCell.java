@@ -125,7 +125,14 @@ public class DownloaderCell extends ListCell {
                     try {
                         Desktop.getDesktop().open(new File(data.downloadDirectory + data.fileName));
                     } catch (IOException ex) {
-                        Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
+                        if (System.getProperty("os.name").contains("win"))
+                            try {
+                                final String cmd =
+                                        String.format("cmd.exe /C start %s",
+                                                new File(data.downloadDirectory + data.fileName).getAbsolutePath());
+                                Runtime.getRuntime().exec(cmd);
+                            } catch (IOException ignored) {
+                            }
                     }
                     break;
                 case OPENFOLDER:
