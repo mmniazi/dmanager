@@ -173,14 +173,7 @@ public class layoutController implements Initializable {
 
         TreeItem<String> allDownloads
                 = new TreeItem<>("All Downloads", new ImageView(new Image(
-                getClass().getResourceAsStream("/resources/White.png"))));
-
-        allDownloads.expandedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) allDownloads.setGraphic(new ImageView(new Image(
-                    getClass().getResourceAsStream("/resources/Black.png"))));
-            else allDownloads.setGraphic(new ImageView(new Image(
-                    getClass().getResourceAsStream("/resources/White.png"))));
-        });
+                getClass().getResourceAsStream("/resources/Grey.png"))));
         allDownloads.setExpanded(true);
 
         TreeItem<String> inProgress
@@ -199,13 +192,13 @@ public class layoutController implements Initializable {
         root.getChildren().addAll(allDownloads, completed, failed, inProgress, paused);
 
         root.getChildren().stream().forEach((parentItem) -> {
-            TreeItem<String> programs = new TreeItem<>("Programs");
-            TreeItem<String> compressed = new TreeItem<>("Compressed");
-            TreeItem<String> documents = new TreeItem<>("Documents");
-            TreeItem<String> videos = new TreeItem<>("Videos");
-            TreeItem<String> audio = new TreeItem<>("Audio");
-            TreeItem<String> images = new TreeItem<>("Images");
-            TreeItem<String> others = new TreeItem<>("Others");
+            TreeItem<String> programs = new TreeItem<>("     Programs");
+            TreeItem<String> compressed = new TreeItem<>("     Compressed");
+            TreeItem<String> documents = new TreeItem<>("     Documents");
+            TreeItem<String> videos = new TreeItem<>("     Videos");
+            TreeItem<String> audio = new TreeItem<>("     Audio");
+            TreeItem<String> images = new TreeItem<>("     Images");
+            TreeItem<String> others = new TreeItem<>("     Others");
             parentItem.getChildren().addAll(programs, compressed, documents, videos, audio, images, others);
         });
 

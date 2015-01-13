@@ -7,15 +7,18 @@ package States;
 
 import Util.State;
 import Util.Utilities;
+import net.minidev.json.JSONObject;
+import net.minidev.json.JSONStyle;
+import net.minidev.json.JSONValue;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
@@ -29,14 +32,16 @@ public class StateManagement {
     private static StateManagement instance = null;
     private BlockingQueue<dataChange> changeList;
     private RandomAccessFile file;
-    private ConcurrentMap<URI, Long> locationMap;
+    private Path filePath;
+    private JSONObject json;
 
     protected StateManagement() {
-        locationMap = new ConcurrentHashMap<>();
+        json = new JSONObject();
         changeList = new LinkedBlockingQueue<>();
         try {
-            file = new RandomAccessFile(System.getProperty("user.home") + "/download.state", "rw");
-        } catch (FileNotFoundException ex) {
+            filePath = Paths.get(System.getProperty("user.home") + "/download.json");
+            file = new RandomAccessFile(filePath.toFile(), "rwd");
+        } catch (IOException ex) {
             Logger.getLogger(StateManagement.class.getName()).log(Level.SEVERE, null, ex);
         }
         start();
@@ -49,50 +54,6 @@ public class StateManagement {
         return instance;
     }
 
-    private void start() {
-        new Thread(() -> {
-            while (true) try {
-                dataChange change;
-                StateData data;
-                StateActivity purpose;
-                long location;
-                change = changeList.take();
-                data = change.data;
-                purpose = change.purpose;
-                switch (purpose) {
-                    case CREATE:
-                        file.seek(file.length());
-                        location = file.getFilePointer();
-                        file.writeBytes(data.toString());
-                        for (int i = 0; i < 1024 - data.toString().length(); i++) file.writeByte(32);
-                        locationMap.put(data.uri, location);
-                        break;
-                    case SAVE:
-                        if (locationMap.containsKey(data.uri)) {
-                            location = locationMap.get(data.uri);
-                            file.seek(location);
-                            file.writeBytes(data.toString());
-                        }
-                        break;
-                    case DELETE:
-                        location = locationMap.get(data.uri);
-                        locationMap.remove(data.uri, location);
-                        byte[] buffer = new byte[1024];
-                        file.seek(location + 1024);
-                        for (int i = 0; file.read(buffer) > -1; i++) {
-                            file.seek(location + i * 1024);
-                            file.write(buffer);
-                            file.seek(location + (i + 2) * 1024);
-                        }
-                        file.setLength(file.length() - 1024);
-                        break;
-                }
-            } catch (IOException | InterruptedException ex) {
-                Logger.getLogger(StateManagement.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }).start();
-    }
-
     public void changeState(StateData data, StateActivity purpose) {
         try {
             changeList.put(new dataChange(data, purpose));
@@ -101,34 +62,71 @@ public class StateManagement {
         }
     }
 
+    private void start() {
+        new Thread(() -> {
+            while (true) try {
+                dataChange change = changeList.take();
+                StateData data = change.data;
+                StateActivity purpose = change.purpose;
+                switch (purpose) {
+                    case CREATE:
+                        json.put(data.uri.toString(), data.toString());
+                        writeChanges();
+                        break;
+                    case SAVE:
+                        json.replace(data.uri.toString(), data.toString());
+                        writeChanges();
+                        break;
+                    case DELETE:
+                        json.remove(data.uri.toString());
+                        writeChanges();
+                        break;
+                }
+            } catch (InterruptedException ex) {
+                Logger.getLogger(StateManagement.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }).start();
+    }
+
+    private void writeChanges() {
+        try {
+            file.setLength(0);
+            file.seek(0);
+            file.writeChars(JSONValue.toJSONString(json, JSONStyle.MAX_COMPRESS));
+        } catch (IOException ex) {
+            Logger.getLogger(StateManagement.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public ArrayList<StateData> readFromFile() {
 
         ArrayList<StateData> downloadsList = new ArrayList<>();
-        String stateString;
-        String stateVariables[];
-        long location = 0;
         try {
-            while ((stateString = file.readLine()) != null) {
-                stateVariables = stateString.split("::");
-                locationMap.put(URI.create(stateVariables[1]), location);
-                downloadsList.add(new StateData(
-                        stateVariables[0],
-                        URI.create(stateVariables[1]),
-                        stateVariables[2],
-                        Utilities.getArrayFromString(stateVariables[3]),
-                        Utilities.getArrayFromString(stateVariables[4]),
-                        new AtomicLong(new Long(stateVariables[5])),
-                        new Integer(stateVariables[6]),
-                        new Long(stateVariables[7]),
-                        State.valueOf(stateVariables[8]),
-                        Boolean.valueOf(stateVariables[9])
-                ));
-                location = file.getFilePointer();
+            if (file.length() != 0) {
+                String string = new String(Files.readAllBytes(filePath)).replace("\u0000", "");
+                json = (JSONObject) JSONValue.parse(string);
+                json.forEach((o, o2) -> downloadsList.add(convert(o2.toString())));
             }
         } catch (IOException ex) {
             Logger.getLogger(StateManagement.class.getName()).log(Level.SEVERE, null, ex);
         }
         return downloadsList;
+    }
+
+    private StateData convert(String stateString) {
+        String stateVariables[] = stateString.split("::");
+        return new StateData(
+                stateVariables[0],
+                URI.create(stateVariables[1]),
+                stateVariables[2],
+                Utilities.getArrayFromString(stateVariables[3]),
+                Utilities.getArrayFromString(stateVariables[4]),
+                new AtomicLong(new Long(stateVariables[5])),
+                new Integer(stateVariables[6]),
+                new Long(stateVariables[7]),
+                State.valueOf(stateVariables[8]),
+                Boolean.valueOf(stateVariables[9])
+        );
     }
 
     private class dataChange {

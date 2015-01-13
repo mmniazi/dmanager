@@ -63,6 +63,6 @@ public class StateData {
         return downloadDirectory + "::" + uri + "::" + fileName
                 + "::" + initialState + "::" + finalState + "::" + bytesDone
                 + "::" + segments + "::" + sizeOfFile + "::" + state + "::"
-                + initialized + "::";
+                + initialized;
     }
 }

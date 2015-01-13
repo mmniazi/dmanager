@@ -39,7 +39,7 @@
     -fx-text-fill: #f9f9f9;
 }
 
-.tree-cell:expanded {
+.tree-cell:selected {
     -fx-background-color: #f9f9f9;
     -fx-text-fill: #333333;
 }
