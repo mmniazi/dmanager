@@ -5,10 +5,12 @@
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="ShadowPane" stylesheets="@../css/MainWindow.css"
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="ShadowPane" fx:id="MainWindow" stylesheets="@../css/MainWindow.css"
             xmlns="http://javafx.com/javafx/8" fx:controller="Controllers.layoutController">
    <children>
-      <AnchorPane id="BackgroundPane" fx:id="MainWindow" layoutX="9.0" layoutY="9.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+       <AnchorPane id="BackgroundPane" layoutX="9.0" layoutY="9.0" maxHeight="-Infinity" maxWidth="-Infinity"
+                   minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="20.0"
+                   AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
           <children>
             <Separator AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="57.0" />
             <Pane layoutX="345.0" layoutY="73.0" AnchorPane.topAnchor="50.0">
@@ -25,7 +27,7 @@
                <children>
                    <TextField id="SearchBar" layoutX="768.0" layoutY="4.0" maxHeight="-Infinity" maxWidth="-Infinity"
                               minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" promptText="Search"
-                              AnchorPane.rightAnchor="85.0" AnchorPane.topAnchor="5.0"/>
+                              visible="false" AnchorPane.rightAnchor="85.0" AnchorPane.topAnchor="5.0"/>
                    <Button id="ExitButton" layoutX="945.0" layoutY="4.0" mnemonicParsing="false"
                            onAction="#exitButtonController" prefHeight="27.0" AnchorPane.rightAnchor="40.0"
                            AnchorPane.topAnchor="5.0">
@@ -62,7 +64,8 @@
                       <Insets bottom="5.0" top="35.0" />
                   </padding>
               </VBox>
-            <HBox layoutX="817.0" layoutY="570.0" spacing="10.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="10.0">
+              <HBox layoutX="817.0" layoutY="570.0" spacing="10.0" visible="false" AnchorPane.bottomAnchor="5.0"
+                    AnchorPane.rightAnchor="10.0">
                <children>
                    <Label layoutX="817.0" layoutY="577.0" prefHeight="27.0" text="Speed Limit:"
                           AnchorPane.bottomAnchor="10.0"/>
@@ -71,7 +74,8 @@
                </children>
             </HBox>
             <Separator AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="50.0" />
-            <HBox alignment="CENTER" layoutX="223.0" layoutY="575.0" prefHeight="25.0" spacing="10.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="210.0">
+              <HBox alignment="CENTER" layoutX="223.0" layoutY="575.0" prefHeight="27.0" spacing="10.0"
+                    AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="210.0" AnchorPane.rightAnchor="10.0">
                <children>
                   <HBox alignment="CENTER" layoutX="223.0" layoutY="575.0">
                      <children>

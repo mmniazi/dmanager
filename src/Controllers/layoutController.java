@@ -1,3 +1,11 @@
+
+/*
+Version 1.0 :
+TODO: make dmanager minimize to task bar
+SUGGESTION: blur opacity should transit from 0 to val.
+SUGGESTION: close may be on right
+*/
+
 package Controllers;
 
 import Components.AddPopUp;
@@ -41,10 +49,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
 
-/**
- * @author muhammad
- */
-
 public class layoutController implements Initializable {
 
     ObservableList<DownloaderCell> downloadsList;
@@ -54,8 +58,7 @@ public class layoutController implements Initializable {
     ButtonState prButtonState = ButtonState.RESUMED;
     TotalSpeedCalc speedCalc;
     int activeDownloads;
-    // make dmanager minimize to task bar
-    // TODO: after add popup shadow disappears
+
     @FXML
     private Button prButton;
     @FXML

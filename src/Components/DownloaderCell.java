@@ -1,8 +1,16 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+Version 2.0 :
+TODO: Check for user permissions for file(in fact there is a method to add administrator rights to your application)
+TODO: Use some method of accurate time instead of sleep for exact speed calculation
+TODO: handle failed downloads
+*/
+
+/*
+Version 1.0 :
+TODO: -1 is returned when i try to download calendar data from link.
+TODO: Tweak speed calculator to adjust its speed to expected level.
+*/
+
 package Components;
 
 import Controllers.layoutController;
@@ -41,16 +49,7 @@ import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * @author muhammad
- */
 public class DownloaderCell extends ListCell {
-
-    // TODO: Check for user permissions for file(in fact there is a method to add administrator rights to your application)
-    // TODO: -1 is returned when i try to download calendar data from link.
-    // TODO: Use some method of accurate time instead of sleep for exact speed calculation
-    // TODO: handle failed downloads
-    // TODO: open and open in folder not working
     private StateManagement stateManager;
     private TotalSpeedCalc speedCalc;
     private layoutController controller;
@@ -125,14 +124,20 @@ public class DownloaderCell extends ListCell {
                     try {
                         Desktop.getDesktop().open(new File(data.downloadDirectory + data.fileName));
                     } catch (IOException ex) {
-                        if (System.getProperty("os.name").contains("win"))
-                            try {
-                                final String cmd =
-                                        String.format("cmd.exe /C start %s",
-                                                new File(data.downloadDirectory + data.fileName).getAbsolutePath());
-                                Runtime.getRuntime().exec(cmd);
-                            } catch (IOException ignored) {
+                        try {
+                            if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                                Runtime.getRuntime().exec("cmd.exe /C start " + data.downloadDirectory + data.fileName);
+
+                            } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+                                Desktop.getDesktop().open(new File(data.downloadDirectory));
+
+                            } else if (System.getProperty("os.name").toLowerCase().contains("nix") ||
+                                    System.getProperty("os.name").toLowerCase().contains("nux") ||
+                                    System.getProperty("os.name").toLowerCase().contains("aix")) {
+                                Desktop.getDesktop().open(new File(data.downloadDirectory));
                             }
+                        } catch (IOException ignored) {
+                        }
                     }
                     break;
                 case OPENFOLDER:
