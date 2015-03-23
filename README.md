@@ -18,10 +18,6 @@ Currently following features are being developed:
 
 - Website
 
-- Marketing Policy
-
-- SEO
-
 ## Advanced Features: ##
 
 - Video acceleration
