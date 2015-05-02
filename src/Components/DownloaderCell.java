@@ -70,7 +70,6 @@ public class DownloaderCell extends ListCell {
     private Label fileLabel, sDoneLabel, sTotalLabel, timeLabel, speedLabel, statusLabel;
 
     public DownloaderCell(StateData data, layoutController controller) {
-        exiting = false;
         speedCalc = TotalSpeedCalc.getInstance();
         stateManager = StateManagement.getInstance();
         this.data = data;
@@ -93,36 +92,34 @@ public class DownloaderCell extends ListCell {
     }
 
     public void change(StateAction action) {
-        if (!exiting) {
-            switch (action) {
-                case DELETE:
-                    if (data.state.equals(State.ACTIVE)) {
-                        pause();
-                    }
-                    delete();
-                    break;
-                case PAUSE:
-                    if (data.state.equals(State.ACTIVE)) {
-                        pause();
-                    }
-                    break;
-                case SHUTDOWN:
-                    exit();
-                    break;
-                case START:
-                    start();
-                    break;
-                case RESTART:
-                    resetData();
-                    start();
-                    break;
-                case OPEN:
-                    openInExplorer(data.downloadDirectory + data.fileName);
-                    break;
-                case OPENFOLDER:
-                    openInExplorer(data.downloadDirectory);
-                    break;
-            }
+        switch (action) {
+            case DELETE:
+                if (data.state.equals(State.ACTIVE)) {
+                    pause();
+                }
+                delete();
+                break;
+            case PAUSE:
+                if (data.state.equals(State.ACTIVE)) {
+                    pause();
+                }
+                break;
+            case SHUTDOWN:
+                exit();
+                break;
+            case START:
+                start();
+                break;
+            case RESTART:
+                resetData();
+                start();
+                break;
+            case OPEN:
+                openInExplorer(data.downloadDirectory + data.fileName);
+                break;
+            case OPENFOLDER:
+                openInExplorer(data.downloadDirectory);
+                break;
         }
     }
 
@@ -202,6 +199,7 @@ public class DownloaderCell extends ListCell {
 
     private void start() {
         data.state = State.ACTIVE;
+        exiting = false;
         threadService = Executors.newCachedThreadPool();
         Platform.runLater(this::initializeCell);
         connect();
@@ -242,7 +240,6 @@ public class DownloaderCell extends ListCell {
             Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
         }
         threadService.shutdown();
-        exiting = false;
     }
 
     private void resetData() {
@@ -277,12 +274,12 @@ public class DownloaderCell extends ListCell {
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
             }
-            if (!data.initialized && !exiting) {
+            if (!data.initialized) {
                 try {
                     HttpGet sizeGet = new HttpGet(data.uri);
                     CloseableHttpResponse sizeResponse = client.execute(sizeGet);
                     data.sizeOfFile = sizeResponse.getEntity().getContentLength();
-                    if (data.sizeOfFile != -1) {
+                    if (data.sizeOfFile != -1 && !exiting) {
                         file.setLength(data.sizeOfFile);
                     }
                 } catch (IOException ex) {
