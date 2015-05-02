@@ -7,9 +7,6 @@ TODO: -1 is returned when i try to download calendar data from link.
 TODO: Tweak speed calculator to adjust its speed to expected level.
 */
 
-/*
-* TODO: Total Speed is not working sometimes doubling and after pause resume not updating
-* */
 package Components;
 
 import Controllers.layoutController;
@@ -328,7 +325,7 @@ public class DownloaderCell extends ListCell {
     private void update() {
         threadService.execute(() -> {
             boolean initialPhase = true;
-            int averageSize = 5;
+            int averageCount = 5;
             controller.updateActiveDownloads(true);
             List<Float> list = new ArrayList<>();
             for (int counter = 0; data.state == State.ACTIVE && !exiting; counter++) {
@@ -338,18 +335,17 @@ public class DownloaderCell extends ListCell {
                 currentBytes = data.bytesDone.get();
                 list.add(speed);
 
-                if (counter > 50) initialPhase = false;
-                if (!initialPhase) averageSize = 50;
-                if (list.size() > averageSize) {
+                if (counter > 30) initialPhase = false;
+                if (!initialPhase) averageCount = 10;
+                if (list.size() > averageCount) {
                     list.remove(0);
                 }
 
                 averageSpeed = list.stream()
                         .map((increment) -> increment)
-                        .reduce(averageSpeed, (accumulator, _item) -> accumulator + _item);
+                        .reduce(averageSpeed, (Float accumulator, Float _item) -> accumulator + _item);
                 averageSpeed /= list.size();
                 speedCalc.updateTotalSpeed(averageSpeed);
-                if (exiting) break;
                 final float finalAverageSpeed = averageSpeed;
                 Platform.runLater(() -> {
                     if (data.sizeOfFile == 0) {
@@ -380,7 +376,7 @@ public class DownloaderCell extends ListCell {
                 });
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(1100);
                 } catch (InterruptedException ignored) {
                 }
             }

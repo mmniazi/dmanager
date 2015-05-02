@@ -45,6 +45,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 public class layoutController implements Initializable {
@@ -55,7 +56,7 @@ public class layoutController implements Initializable {
     StateManagement stateManager;
     ButtonState prButtonState = ButtonState.RESUMED;
     TotalSpeedCalc speedCalc;
-    int activeDownloads;
+    AtomicInteger activeDownloads;
 
     @FXML
     private Button prButton;
@@ -127,7 +128,7 @@ public class layoutController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        activeDownloads = 0;
+        activeDownloads = new AtomicInteger(0);
         stateManager = StateManagement.getInstance();
         downloadsList = FXCollections.observableArrayList();
         connectionManager = new PoolingHttpClientConnectionManager();
@@ -316,18 +317,16 @@ public class layoutController implements Initializable {
     }
 
     public void updateTotalSpeed(int speed) {
-        Platform.runLater(()
-                        -> totalSpeedLabel.setText(Util.Utilities.speedConverter(speed))
-        );
+        Platform.runLater(() -> totalSpeedLabel.setText(Util.Utilities.speedConverter(speed)));
     }
 
     public void updateActiveDownloads(boolean isIncremented) {
         if (isIncremented) {
-            Platform.runLater(() -> totalDownloadsLabel.setText(String.valueOf(++activeDownloads)));
-            speedCalc.updateActiveDownloads(activeDownloads);
+            speedCalc.updateActiveDownloads(activeDownloads.incrementAndGet());
+            Platform.runLater(() -> totalDownloadsLabel.setText(String.valueOf(activeDownloads)));
         } else {
-            Platform.runLater(() -> totalDownloadsLabel.setText(String.valueOf(--activeDownloads)));
-            speedCalc.updateActiveDownloads(activeDownloads);
+            speedCalc.updateActiveDownloads(activeDownloads.decrementAndGet());
+            Platform.runLater(() -> totalDownloadsLabel.setText(String.valueOf(activeDownloads)));
         }
     }
 

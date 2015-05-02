@@ -8,23 +8,23 @@ package Util;
 import Controllers.layoutController;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
- *
  * @author muhammad
  */
 public class TotalSpeedCalc {
 
     private static final TotalSpeedCalc instance = new TotalSpeedCalc();
     private final AtomicInteger speed;
-    private final AtomicInteger counter;
-    private final AtomicInteger activeDownloads;
+    private final AtomicLong counter;
+    private final AtomicInteger active;
     private layoutController controller;
 
     private TotalSpeedCalc() {
-        this.counter = new AtomicInteger(0);
-        this.speed = new AtomicInteger(0);
-        this.activeDownloads = new AtomicInteger(0);
+        counter = new AtomicLong(0);
+        speed = new AtomicInteger(0);
+        active = new AtomicInteger(0);
     }
 
     public static TotalSpeedCalc getInstance() {
@@ -36,18 +36,15 @@ public class TotalSpeedCalc {
     }
 
     public void updateActiveDownloads(int activeDownloads) {
-        this.activeDownloads.set(activeDownloads);
-        this.counter.set(0);
-        this.speed.set(0);
-        if (activeDownloads == 0) controller.updateTotalSpeed(0);
+        this.active.set(activeDownloads);
+        if (this.active.get() == 0) controller.updateTotalSpeed(0);
     }
 
     public void updateTotalSpeed(float newSpeed) {
         this.speed.addAndGet((int) newSpeed);
-        if (this.counter.incrementAndGet() == activeDownloads.get()) {
+        if (active.get() != 0 && (counter.incrementAndGet() % active.get()) == 0) {
             controller.updateTotalSpeed(speed.get());
-            this.counter.set(0);
-            this.speed.set(0);
+            speed.set(0);
         }
     }
 }
