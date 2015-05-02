@@ -2,8 +2,6 @@
 /*
 Version 1.0 :
 TODO: make dmanager minimize to task bar
-SUGGESTION: blur opacity should transit from 0 to val.
-SUGGESTION: close may be on right
 */
 
 package Controllers;

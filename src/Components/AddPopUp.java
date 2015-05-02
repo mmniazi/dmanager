@@ -59,10 +59,11 @@ public class AddPopUp {
     @FXML
     private AnchorPane pane;
 
-    // start while asking for start
-    // automatically paste from clip board when popup starts
-    // change image based on file type
-    // if file is not found on server change text field to red.
+/* Version 2
+* TODO: start while asking for start
+* TODO: automatically paste from clip board when popup starts
+* TODO: change image based on file type
+*/
 
     public AddPopUp(layoutController controller, AnchorPane mainWindow) {
         this.controller = controller;

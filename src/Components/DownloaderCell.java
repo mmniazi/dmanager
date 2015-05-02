@@ -3,14 +3,13 @@ Version 2.0 :
 TODO: Check for user permissions for file(in fact there is a method to add administrator rights to your application)
 TODO: Use some method of accurate time instead of sleep for exact speed calculation
 TODO: handle failed downloads
-*/
-
-/*
-Version 1.0 :
 TODO: -1 is returned when i try to download calendar data from link.
 TODO: Tweak speed calculator to adjust its speed to expected level.
 */
 
+/*
+* TODO: Total Speed is not working sometimes doubling and after pause resume not updating
+* */
 package Components;
 
 import Controllers.layoutController;
@@ -22,16 +21,13 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
 import javafx.scene.control.*;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -121,32 +117,34 @@ public class DownloaderCell extends ListCell {
                     start();
                     break;
                 case OPEN:
-                    try {
-                        Desktop.getDesktop().open(new File(data.downloadDirectory + data.fileName));
-                    } catch (IOException ex) {
-                        try {
-                            if (System.getProperty("os.name").toLowerCase().contains("win")) {
-                                Runtime.getRuntime().exec("cmd.exe /C start " + data.downloadDirectory + data.fileName);
-
-                            } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-                                Desktop.getDesktop().open(new File(data.downloadDirectory));
-
-                            } else if (System.getProperty("os.name").toLowerCase().contains("nix") ||
-                                    System.getProperty("os.name").toLowerCase().contains("nux") ||
-                                    System.getProperty("os.name").toLowerCase().contains("aix")) {
-                                Desktop.getDesktop().open(new File(data.downloadDirectory));
-                            }
-                        } catch (IOException ignored) {
-                        }
-                    }
+                    openInExplorer(data.downloadDirectory + data.fileName);
                     break;
                 case OPENFOLDER:
-                    try {
-                        Desktop.getDesktop().open(new File(data.downloadDirectory));
-                    } catch (IOException ex) {
-                        Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    openInExplorer(data.downloadDirectory);
                     break;
+            }
+        }
+    }
+
+    private void openInExplorer(String file) {
+        String OS = System.getProperty("os.name").toLowerCase();
+        if (OS.contains("win")) {
+            try {
+                Runtime.getRuntime().exec("explorer.exe /select, " + file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (OS.contains("mac")) {
+            try {
+                Runtime.getRuntime().exec("open -R " + file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (OS.contains("nix") || OS.contains("nux") || OS.contains("aix")) {
+            try {
+                Runtime.getRuntime().exec("xdg-open " + file);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -284,7 +282,9 @@ public class DownloaderCell extends ListCell {
                     HttpGet sizeGet = new HttpGet(data.uri);
                     CloseableHttpResponse sizeResponse = client.execute(sizeGet);
                     data.sizeOfFile = sizeResponse.getEntity().getContentLength();
-                    file.setLength(data.sizeOfFile);
+                    if (data.sizeOfFile != -1) {
+                        file.setLength(data.sizeOfFile);
+                    }
                 } catch (IOException ex) {
                     Logger.getLogger(DownloaderCell.class.getName()).log(Level.SEVERE, null, ex);
                 }
