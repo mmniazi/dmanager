@@ -18,10 +18,6 @@ Currently following features are being developed:
 
 - Website
 
-- Marketing Policy
-
-- SEO
-
 ## Advanced Features: ##
 
 - Video acceleration
@@ -42,3 +38,7 @@ Currently following features are being developed:
 
 
 Email me @** muhammad.mohsin1994@gmail.com** if you want to contribute to this project.
+
+![1.png](https://bitbucket.org/repo/bnMzLa/images/3819613512-1.png)
+![2.png](https://bitbucket.org/repo/bnMzLa/images/3584533889-2.png)
+![3.png](https://bitbucket.org/repo/bnMzLa/images/3344103101-3.png)
