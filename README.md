@@ -1,6 +1,6 @@
 Dmanager
 ========
-An elegent download manager designed for best user experience and performance.
+An elegant download manager designed for best user experience and performance.
 
 Dmanager uses appache httpClient for transfering data over http coupled with channels for ensuring high speed.
 
