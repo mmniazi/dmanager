@@ -1,9 +1,4 @@
 
-/*
-Version 1.0 :
-TODO: make dmanager minimize to task bar
-*/
-
 package Controllers;
 
 import Components.AddPopUp;
@@ -23,6 +18,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -40,6 +37,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,6 +49,8 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class layoutController implements Initializable {
 
@@ -115,11 +119,19 @@ public class layoutController implements Initializable {
     @FXML
     private void minimizeButtonController(ActionEvent event) {
         Stage stage = (Stage) MainWindow.getScene().getWindow();
-        stage.setIconified(true);
+        if (SystemTray.isSupported()) {
+            stage.hide();
+        } else {
+            stage.setIconified(true);
+        }
     }
 
     @FXML
     private void exitButtonController(ActionEvent event) {
+        shutDown();
+    }
+
+    private void shutDown() {
         downloadsList.forEach(cell -> cell.change(StateAction.SHUTDOWN));
         connectionManager.shutdown();
         Platform.exit();
@@ -332,6 +344,49 @@ public class layoutController implements Initializable {
 
     public CloseableHttpClient getClient() {
         return client;
+    }
+
+
+    public void createTrayIcon(Stage stage) {
+        if (SystemTray.isSupported()) {
+            SystemTray tray = SystemTray.getSystemTray();
+
+            PopupMenu popup = new PopupMenu();
+
+            java.awt.MenuItem showItem = new java.awt.MenuItem("Show");
+            showItem.addActionListener(event -> Platform.runLater(stage::show));
+            popup.add(showItem);
+
+            java.awt.MenuItem closeItem = new java.awt.MenuItem("Close");
+            closeItem.addActionListener(event -> shutDown());
+            popup.add(closeItem);
+
+            java.awt.Image image;
+            try {
+
+                if (tray.getTrayIconSize().getWidth() > 32) {
+                    image = ImageIO.read(
+                            new File(getClass().getResource("/resources/TrayIcon64.png").toURI()));
+                } else if (tray.getTrayIconSize().getWidth() > 16) {
+                    image = ImageIO.read(
+                            new File(getClass().getResource("/resources/TrayIcon32.png").toURI()));
+                } else {
+                    image = ImageIO.read(
+                            new File(getClass().getResource("/resources/TrayIcon16.png").toURI()));
+                }
+
+                TrayIcon trayIcon = new TrayIcon(image, "Dmanager", popup);
+                trayIcon.addActionListener(event -> Platform.runLater(stage::show));
+                tray.add(trayIcon);
+
+            } catch (IOException | AWTException | URISyntaxException ex) {
+                Logger.getLogger(layoutController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    public AnchorPane getMainWindow() {
+        return MainWindow;
     }
 }
 

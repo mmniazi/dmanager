@@ -1,7 +1,8 @@
-
 package dmanager;
 
+import Controllers.layoutController;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -14,22 +15,36 @@ import javafx.stage.StageStyle;
  */
 public class Dmanager extends Application {
 
-  /**
-   * @param args the command line arguments
-   */
   public static void main(String[] args) {
     launch(args);
   }
 
   @Override
   public void start(Stage stage) throws Exception {
-    Parent root = FXMLLoader.load(getClass().getResource("/fxml/MainWindow.fxml"));
-
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainWindow.fxml"));
+    Parent root = loader.load();
+    Platform.setImplicitExit(false);
     Scene scene = new Scene(root);
     scene.setFill(Color.TRANSPARENT);
     stage.initStyle(StageStyle.TRANSPARENT);
     stage.setScene(scene);
     stage.show();
+    layoutController controller = loader.getController();
+    controller.createTrayIcon(stage);
+
+    Delta delta = new Delta();
+    controller.getMainWindow().setOnMousePressed(event -> {
+      delta.x = stage.getX() - event.getScreenX();
+      delta.y = stage.getY() - event.getScreenY();
+    });
+
+    controller.getMainWindow().setOnMouseDragged(event -> {
+      stage.setX(event.getScreenX() + delta.x);
+      stage.setY(event.getScreenY() + delta.y);
+    });
   }
 
+  class Delta {
+    double x, y;
+  }
 }
