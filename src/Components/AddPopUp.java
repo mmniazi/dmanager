@@ -30,6 +30,14 @@ import java.nio.file.Paths;
 /**
  * @author muhammad
  */
+
+
+/* Version 2
+* TODO: start while asking for start
+* TODO: automatically paste from clip board when popup starts
+* TODO: change image based on file type
+*/
+
 public class AddPopUp {
 
     private final Popup popupWindow;
@@ -53,12 +61,6 @@ public class AddPopUp {
     private TextField segmentField;
     @FXML
     private AnchorPane pane;
-
-/* Version 2
-* TODO: start while asking for start
-* TODO: automatically paste from clip board when popup starts
-* TODO: change image based on file type
-*/
 
     public AddPopUp(layoutController controller, AnchorPane mainWindow) {
         this.controller = controller;

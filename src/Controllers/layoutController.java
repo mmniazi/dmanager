@@ -39,9 +39,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -365,21 +363,18 @@ public class layoutController implements Initializable {
             try {
 
                 if (tray.getTrayIconSize().getWidth() > 32) {
-                    image = ImageIO.read(
-                            new File(getClass().getResource("/resources/TrayIcon64.png").toURI()));
+                    image = ImageIO.read(getClass().getResourceAsStream("/resources/TrayIcon64.png"));
                 } else if (tray.getTrayIconSize().getWidth() > 16) {
-                    image = ImageIO.read(
-                            new File(getClass().getResource("/resources/TrayIcon32.png").toURI()));
+                    image = ImageIO.read(getClass().getResourceAsStream("/resources/TrayIcon32.png"));
                 } else {
-                    image = ImageIO.read(
-                            new File(getClass().getResource("/resources/TrayIcon16.png").toURI()));
+                    image = ImageIO.read(getClass().getResourceAsStream("/resources/TrayIcon16.png"));
                 }
 
                 TrayIcon trayIcon = new TrayIcon(image, "Dmanager", popup);
                 trayIcon.addActionListener(event -> Platform.runLater(stage::show));
                 tray.add(trayIcon);
 
-            } catch (IOException | AWTException | URISyntaxException ex) {
+            } catch (IOException | AWTException ex) {
                 Logger.getLogger(layoutController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
