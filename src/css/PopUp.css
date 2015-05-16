@@ -9,6 +9,11 @@
     -fx-background-radius: 2;
 }
 
+#ShadowPane {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+}
+
 .button {
     -fx-background-radius: 2;
     -fx-background-color: #3498db;

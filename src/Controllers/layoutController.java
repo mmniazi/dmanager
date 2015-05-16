@@ -4,6 +4,7 @@ package Controllers;
 import Components.AddPopUp;
 import Components.DownloaderCell;
 import Components.InListPopUp;
+import Components.SocketListener;
 import States.StateActivity;
 import States.StateData;
 import States.StateManagement;
@@ -73,7 +74,7 @@ public class layoutController implements Initializable {
 
     @FXML
     private void addButtonController(ActionEvent actionEvent) {
-        new AddPopUp(this, MainWindow);
+        new AddPopUp(this);
     }
 
     @FXML
@@ -132,6 +133,7 @@ public class layoutController implements Initializable {
     private void shutDown() {
         downloadsList.forEach(cell -> cell.change(StateAction.SHUTDOWN));
         connectionManager.shutdown();
+        SocketListener.getInstance().stopListening();
         Platform.exit();
         System.exit(0);
     }
@@ -156,6 +158,8 @@ public class layoutController implements Initializable {
         initDownloadsList();
         initCategoriesTree();
         setKeyMapping();
+        SocketListener.setController(this);
+        SocketListener.getInstance().startListening();
     }
 
     private void setKeyMapping() {
@@ -352,7 +356,10 @@ public class layoutController implements Initializable {
             PopupMenu popup = new PopupMenu();
 
             java.awt.MenuItem showItem = new java.awt.MenuItem("Show");
-            showItem.addActionListener(event -> Platform.runLater(stage::show));
+            showItem.addActionListener(event -> Platform.runLater(() -> {
+                stage.show();
+                stage.setIconified(false);
+            }));
             popup.add(showItem);
 
             java.awt.MenuItem closeItem = new java.awt.MenuItem("Close");

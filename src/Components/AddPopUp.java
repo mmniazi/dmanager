@@ -5,20 +5,20 @@ import States.Defaults;
 import States.StateData;
 import Util.UriPart;
 import Util.Utilities;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Clipboard;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.Popup;
-import javafx.stage.PopupWindow;
-import javafx.stage.Window;
+import javafx.scene.paint.Color;
+import javafx.stage.*;
 import org.apache.commons.validator.routines.UrlValidator;
 
 import java.io.File;
@@ -34,18 +34,18 @@ import java.nio.file.Paths;
 
 /* Version 2
 * TODO: start while asking for start
-* TODO: automatically paste from clip board when popup starts
 * TODO: change image based on file type
+* TODO: keyboard focus is not on popup on shown
 */
 
 public class AddPopUp {
 
-    private final Popup popupWindow;
+    private final Stage stage;
     Defaults defaults = new Defaults();
     UrlValidator urlValidator = new UrlValidator();
     layoutController controller;
     Window window;
-    ChangeListener<Boolean> focusListener;
+    AnchorPane mainWindow;
 
     @FXML
     private Button startButton;
@@ -62,9 +62,14 @@ public class AddPopUp {
     @FXML
     private AnchorPane pane;
 
-    public AddPopUp(layoutController controller, AnchorPane mainWindow) {
+    public AddPopUp(layoutController controller) {
+        this(controller, null);
+    }
+
+    public AddPopUp(layoutController controller, String url) {
         this.controller = controller;
-        this.window = mainWindow.getScene().getWindow();
+        mainWindow = controller.getMainWindow();
+        window = mainWindow.getScene().getWindow();
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/AddPopUp.fxml"));
         fxmlLoader.setController(this);
@@ -74,24 +79,24 @@ public class AddPopUp {
             throw new RuntimeException(e);
         }
 
-        popupWindow = new Popup();
-        popupWindow.getContent().add(pane);
 
-        popupWindow.setOnShown(event -> mainWindow.setEffect(new GaussianBlur(7)));
-        popupWindow.setOnHidden(event -> mainWindow.setEffect(null));
+        stage = new Stage();
+        Scene scene = new Scene(pane);
+        stage.getIcons().add(new Image("resources/icon.png"));
+        scene.setFill(Color.TRANSPARENT);
+        stage.initStyle(StageStyle.TRANSPARENT);
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(window);
+        stage.setScene(scene);
 
-        popupWindow.show(window);
-        popupWindow.centerOnScreen();
-        popupWindow.setAutoFix(true);
-        popupWindow.setAnchorLocation(PopupWindow.AnchorLocation.WINDOW_TOP_RIGHT);
-        focusListener = (observable, oldValue, newValue) -> {
-            if (newValue) popupWindow.show(window);
-            else popupWindow.hide();
-        };
-        window.focusedProperty().addListener(focusListener);
+        stage.setOnShown(event -> mainWindow.setEffect(new GaussianBlur(7)));
+        stage.setOnHidden(event -> mainWindow.setEffect(null));
 
-        segmentField.setText(String.valueOf(defaults.getSegments()));
-        locationField.setText(defaults.getDownloadLocation());
+        stage.setAlwaysOnTop(true);
+        stage.centerOnScreen();
+        stage.requestFocus();
+        stage.show();
+
         uriField.textProperty()
                 .addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
                     if (urlValidator.isValid(newValue)) {
@@ -104,6 +109,16 @@ public class AddPopUp {
                         startButton.setDisable(true);
                     }
                 });
+
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        if (url != null) {
+            uriField.setText(url);
+        } else if (clipboard.hasString() && urlValidator.isValid(clipboard.getString())) {
+            uriField.setText(clipboard.getString());
+        }
+
+        segmentField.setText(String.valueOf(defaults.getSegments()));
+        locationField.setText(defaults.getDownloadLocation());
     }
 
     @FXML
@@ -111,14 +126,12 @@ public class AddPopUp {
         StateData data = new StateData(locationField.getText(),
                 URI.create(uriField.getText()), nameField.getText(), 10);
         controller.addDownload(data);
-        window.focusedProperty().removeListener(focusListener);
-        popupWindow.hide();
+        stage.hide();
     }
 
     @FXML
     private void cancelButtonController(ActionEvent event) {
-        window.focusedProperty().removeListener(focusListener);
-        popupWindow.hide();
+        stage.hide();
     }
 
     @FXML
@@ -126,7 +139,7 @@ public class AddPopUp {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Download Directory");
         chooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        File selectedDirectory = chooser.showDialog(popupWindow);
+        File selectedDirectory = chooser.showDialog(stage);
         if (!(selectedDirectory == null)) {
             locationField.setText(selectedDirectory.toString());
             nameField.setText(validFileName());

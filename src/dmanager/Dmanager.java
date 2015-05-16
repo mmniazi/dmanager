@@ -11,9 +11,15 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+/*
+* Version 2.0:
+* TODO: May use windows/platform registry
+*/
+
 /**
  * @author muhammad
  */
+
 public class Dmanager extends Application {
 
     public static void main(String[] args) {
