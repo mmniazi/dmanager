@@ -2,42 +2,20 @@ Dmanager
 ========
 An elegant download manager designed for best user experience and performance.
 
-Dmanager uses appache httpClient for transfering data over http coupled with channels for ensuring high speed.
+Uses threadpools coupled with blocking queue for downloading(and some optimizations like work stealing threads, dynamically redistributing work between threads, and random access file channels). Front-end is implemented using javafx with few custom controls.
 
-For creating  front-end dmanager uses javafx and make uses of javafx css styling and custom controls.
+Dmanager is not maintained any more...
 
-Dmanager is currently under development and any help will be appreciated.
+## Features: ##
 
-Currently following features are being developed:
+- Multipart downloading with reconnections
 
-## Basic Features: ##
+- Downloads management, pause/resume, resume after restart
 
 - Browsers plugins
 
-- Site Handling
 
-- Website
-
-## Advanced Features: ##
-
-- Video acceleration
-
-- Page acceleration
-
-- On keystroke search
-
-- Torrent and metalink downloading
-
-- Content preview while downloading
-
-- File Format converter
-
-- MD5 or SHA-1 download authentication
-
-- Native executables for windows,mac and linux
-
-
-Email me @** muhammad.mohsin1994@gmail.com** if you want to contribute to this project.
+Email me at **muhammad.mohsin1994 AT gmail.com** if you want to maintain this project.
 
 ![1.png](https://bitbucket.org/repo/bnMzLa/images/3819613512-1.png)
 ![2.png](https://bitbucket.org/repo/bnMzLa/images/3584533889-2.png)
