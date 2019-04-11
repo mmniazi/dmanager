@@ -13,6 +13,7 @@ Uses threadpools coupled with blocking queue for downloading(and some optimizati
 - Browsers plugins
 
 
-Dmanager is not maintained any more email me at **mohsinniazikk AT gmail** if you want to maintain this project.
+Dmanager is not maintained any more email me at **mohsinniazikk at gmail** if you want to maintain this project.
 
-
+![](src/resources/main.png)
+![](src/resources/download.png)
