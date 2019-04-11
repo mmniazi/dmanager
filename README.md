@@ -17,6 +17,4 @@ Dmanager is not maintained any more...
 
 Email me at **muhammad.mohsin1994 AT gmail.com** if you want to maintain this project.
 
-![1.png](https://bitbucket.org/repo/bnMzLa/images/3819613512-1.png)
-![2.png](https://bitbucket.org/repo/bnMzLa/images/3584533889-2.png)
-![3.png](https://bitbucket.org/repo/bnMzLa/images/3344103101-3.png)
+
